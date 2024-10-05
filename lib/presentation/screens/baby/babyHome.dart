@@ -61,10 +61,26 @@ class _BabyHomeState extends State<BabyHome> {
       ),
       body: Center(
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          ElevatedButton(onPressed: () {}, child: Text("المتابعة الدورية")),
-          ElevatedButton(onPressed: () {}, child: Text("حجز في مستشفى")),
-          ElevatedButton(onPressed: () {}, child: Text("حجز اونلاين")),
-          ElevatedButton(onPressed: () {}, child: Text("الحجوزات السابقة")),
+          ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, "periodicFollowUp");
+              },
+              child: Text("المتابعة الدورية")),
+          ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, "offlineDoctorBooking");
+              },
+              child: Text("حجز في مستشفى")),
+          ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, "onlineDoctorBooking");
+              },
+              child: Text("حجز اونلاين")),
+          ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, "babyPreviousBookings");
+              },
+              child: Text("الحجوزات السابقة")),
         ]),
       ),
     );

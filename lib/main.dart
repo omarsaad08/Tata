@@ -32,12 +32,11 @@ class MainApp extends StatelessWidget {
           // fontFamily: "Hacen-Liner-Print-out",
           // fontFamily: "Cairo",
           // fontFamily: "NotoNaskhArabic",
-          //     colorScheme: ColorScheme.light(
-          //   primary: clr(1),
-          //   onPrimary: clr(5),
-          //   onSurface: clr(1),
-          // )
-          ),
+          colorScheme: ColorScheme.light(
+        primary: clr(1),
+        // onPrimary: clr(5),
+        // onSurface: clr(1),
+      )),
       initialRoute: user == null ? "login" : "babyHome",
       onGenerateRoute: appRouter.generateRoute,
       // for making the app RTL

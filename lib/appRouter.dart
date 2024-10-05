@@ -5,9 +5,12 @@ import 'package:tata/presentation/screens/auth/userSetup.dart';
 import 'package:tata/presentation/screens/baby/babyHome.dart';
 import "package:tata/presentation/screens/auth/babySetup.dart";
 import "package:tata/presentation/screens/auth/hospitalSetup.dart";
+import 'package:tata/presentation/screens/baby/doctorBookingDetails.dart';
+import 'package:tata/presentation/screens/baby/followUpResult.dart';
 import 'package:tata/presentation/screens/baby/offlineDoctorBooking.dart';
 import 'package:tata/presentation/screens/baby/onlineDoctorBooking.dart';
 import 'package:tata/presentation/screens/baby/periodicFollowUp.dart';
+import 'package:tata/presentation/screens/baby/previousBookings.dart';
 
 class AppRouter {
   Route? generateRoute(RouteSettings settings) {
@@ -30,6 +33,14 @@ class AppRouter {
         return MaterialPageRoute(builder: (context) => OnlineDoctorBooking());
       case "offlineDoctorBooking":
         return MaterialPageRoute(builder: (context) => OfflineDoctorBooking());
+      case "followUpResult":
+        return MaterialPageRoute(builder: (context) => FollowUpResult());
+      case "doctorBookingDetails":
+        final doctor = settings.arguments as Map<String, String>;
+        return MaterialPageRoute(
+            builder: (context) => DoctorBookingDetails(doctor: doctor));
+      case 'babyPreviousBookings':
+        return MaterialPageRoute(builder: (context) => PreviousBookings());
     }
   }
 }

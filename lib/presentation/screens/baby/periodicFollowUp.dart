@@ -23,25 +23,64 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("المتابعة الدورية"),
-          centerTitle: true,
-        ),
-        body: Center(
-          child: Column(children: [
-            ListView.builder(
-              itemCount: _checklistItems.length,
-              itemBuilder: (context, index) {
-                return CheckboxListTile(
-                  title: Text(_checklistItems[index]['label']),
-                  value: _checklistItems[index]['isChecked'],
-                  onChanged: (bool? value) {
-                    _handleCheckboxChange(index, value);
-                  },
-                );
+      appBar: AppBar(
+        title: Text("المتابعة الدورية"),
+        centerTitle: true,
+      ),
+      body: ListView(
+        children: [
+          ElevatedButton(onPressed: () {}, child: Text("تغير الفئة العمرية")),
+          ExpansionTile(
+            title: Text("My Tasks"), // Title of the foldable section
+            leading: Icon(Icons.check_box), // Optional leading icon
+            children: _checklistItems.map((item) {
+              int index = _checklistItems.indexOf(item);
+              return CheckboxListTile(
+                title: Text(item['label']),
+                value: item['isChecked'],
+                onChanged: (bool? value) {
+                  _handleCheckboxChange(index, value);
+                },
+              );
+            }).toList(),
+          ),
+          ExpansionTile(
+            title: Text("My Tasks"), // Title of the foldable section
+            leading: Icon(Icons.check_box), // Optional leading icon
+            children: _checklistItems.map((item) {
+              int index = _checklistItems.indexOf(item);
+              return CheckboxListTile(
+                title: Text(item['label']),
+                value: item['isChecked'],
+                onChanged: (bool? value) {
+                  _handleCheckboxChange(index, value);
+                },
+              );
+            }).toList(),
+          ),
+          ExpansionTile(
+            title: Text("My Tasks"), // Title of the foldable section
+            leading: Icon(Icons.check_box), // Optional leading icon
+            children: _checklistItems.map((item) {
+              int index = _checklistItems.indexOf(item);
+              return CheckboxListTile(
+                title: Text(item['label']),
+                value: item['isChecked'],
+                onChanged: (bool? value) {
+                  _handleCheckboxChange(index, value);
+                },
+              );
+            }).toList(),
+          ),
+          ElevatedButton(
+              onPressed: () {
+                // send the data to the server to analyze it
+
+                Navigator.pushNamed(context, "followUpResult");
               },
-            ),
-          ]),
-        ));
+              child: Text("تم")),
+        ],
+      ),
+    );
   }
 }

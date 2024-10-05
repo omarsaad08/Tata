@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 Color clr(int colorNum) {
   switch (colorNum) {
+    case 0:
+      return Colors.white;
     case 1:
       return Color(0xffE26868);
     case 2:
