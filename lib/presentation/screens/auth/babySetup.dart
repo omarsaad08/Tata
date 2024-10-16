@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:tata/data/auth.dart';
+import 'package:tata/data/storage.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class BabySetup extends StatefulWidget {
   BabySetup({super.key});
@@ -12,7 +15,8 @@ class BabySetup extends StatefulWidget {
 class _BabySetupState extends State<BabySetup> {
   DateTime? selectedDate;
   TextEditingController babyNameController = TextEditingController();
-
+  TextEditingController phoneController = TextEditingController();
+  String? message;
   Future<void> pickDate(BuildContext context) async {
     DateTime? pickedDate = await showDatePicker(
         context: context, firstDate: DateTime(2000), lastDate: DateTime(2100));
@@ -29,7 +33,7 @@ class _BabySetupState extends State<BabySetup> {
         appBar: AppBar(
           title: Text("تسجيل بيانات الطفل", style: TextStyle(color: clr(0))),
           centerTitle: true,
-          backgroundColor: clr(2),
+          backgroundColor: clr(1),
         ),
         body: Container(
           padding: EdgeInsets.all(16),
@@ -44,6 +48,16 @@ class _BabySetupState extends State<BabySetup> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       prefixIcon: const Icon(Icons.person),
+                      prefixIconColor: clr(1))),
+              SizedBox(height: 16),
+              TextField(
+                  controller: phoneController,
+                  decoration: InputDecoration(
+                      labelText: 'رقم الهاتف',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      prefixIcon: const Icon(Icons.phone),
                       prefixIconColor: clr(1))),
               SizedBox(height: 16),
               Row(
@@ -61,10 +75,30 @@ class _BabySetupState extends State<BabySetup> {
                       ? "لا يوجد تاريخ"
                       : 'الميلاد:${selectedDate!.toLocal()}'.split(' ')[0],
                   style: TextStyle(fontSize: 18)),
-              mainElevatedButton("تم", () {
+              mainElevatedButton("تم", () async {
+                message = '';
                 // handle the logic of saving the child's data + check if he is less than 2 years or not
-                Navigator.pushReplacementNamed(context, "babyHome");
-              })
+                final data = {
+                  "name": babyNameController.text,
+                  "date_of_birth":
+                      selectedDate!.toLocal().toString().split(' ')[0],
+                  "email": await Storage.get('email'),
+                  "phone": phoneController.text
+                };
+                final result = await Auth.saveUser(data, 'baby');
+                if (result == 0) {
+                  Navigator.pushReplacementNamed(context, "babyHome");
+                } else {
+                  setState(() {
+                    message = 'عذرا حدث خطا';
+                  });
+                }
+              }),
+              message != null
+                  ? Text(message!)
+                  : message == ''
+                      ? CircularProgressIndicator(color: clr(1))
+                      : Container()
             ],
           ),
         ));

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tata/presentation/components/mainElevatedButton.dart';
+import 'package:tata/presentation/components/theme.dart';
 
 class OfflineDoctorBooking extends StatefulWidget {
   const OfflineDoctorBooking({super.key});
@@ -10,31 +12,31 @@ class OfflineDoctorBooking extends StatefulWidget {
 class _OfflineDoctorBookingState extends State<OfflineDoctorBooking> {
   final List<Map<String, String>> doctors = [
     {
-      "name": "Dr. Ahmed",
+      "name": "احمد محمد",
       "speciality": "Cardiologist",
-      "experience": "10 years",
-      "imageUrl": "https://via.placeholder.com/120"
+      "experience": "10 سنين",
+      "imageUrl": "doctor-ahmed.png"
     },
     {
-      "name": "Dr. Sara",
+      "name": "محمد مصطفى",
       "speciality": "Dermatologist",
-      "experience": "5 years",
-      "imageUrl": "https://via.placeholder.com/120"
+      "experience": "5 سنين",
+      "imageUrl": "doctor-mohamed.png"
     },
     {
-      "name": "Dr. John",
+      "name": "خالد احمد",
       "speciality": "Pediatrician",
-      "experience": "8 years",
-      "imageUrl": "https://via.placeholder.com/120"
+      "experience": "8 سنين",
+      "imageUrl": "doctor-khalid.png"
     },
   ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("حجز دكتور"),
-          centerTitle: true,
-        ),
+            title: Text("حجز دكتور", style: TextStyle(color: clr(0))),
+            centerTitle: true,
+            backgroundColor: clr(1)),
         body: ListView.builder(
           itemCount: doctors.length,
           itemBuilder: (context, index) {
@@ -59,6 +61,7 @@ class DoctorCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.all(10),
+      color: clr(2),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
@@ -71,22 +74,22 @@ class DoctorCard extends StatelessWidget {
                   doctor["name"]!,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                // Display the doctor's speciality
-                Text("Speciality: ${doctor["speciality"]}"),
                 // Display the doctor's experience
-                Text("Experience: ${doctor["experience"]}"),
+                Text("الخبرة: ${doctor["experience"]}"),
                 SizedBox(height: 10),
                 // Button to open the detailed screen
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, "doctorBookingDetails",
-                        arguments: doctor);
-                  },
-                  child: Text("View Details"),
-                ),
+                mainElevatedButton("تفاصيل", () {
+                  Navigator.pushNamed(context, "doctorBookingDetails",
+                      arguments: doctor);
+                }),
               ],
             ),
-            Column(children: [Image.network(doctor["imageUrl"]!)]),
+            Column(children: [
+              Image.asset(
+                'assets/${doctor["imageUrl"]!}',
+                width: 120,
+              )
+            ]),
           ],
         ),
       ),

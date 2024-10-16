@@ -1,9 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:tata/data/storage.dart';
+import 'package:dio/dio.dart';
 
 final auth = FirebaseAuth.instance;
 final googleSignIn = GoogleSignIn();
+final dio = Dio();
+final baseUrl = 'http://192.168.1.219:3000';
 
 class Auth {
   static Future<int?> signupWithEmail(String email, String password) async {
@@ -62,6 +66,32 @@ class Auth {
       return userCredential.user;
     } catch (e) {
       print('Error signing in with Google: $e');
+      return null;
+    }
+  }
+
+  static Future<int?> saveUser(Map data, String type) async {
+    try {
+      Response response = await dio.post('$baseUrl/$type', data: data);
+      if (response.statusCode != 200) {
+        throw Exception('error');
+      }
+      print('data: ${response.data}');
+      await Storage.saveIdAndType(response.data['id'].toString(), type);
+      return 0;
+    } catch (e) {
+      print('e: $e');
+    }
+  }
+
+  static Future<Map?> getUser(String id, String type) async {
+    try {
+      Response response = await dio.get('$baseUrl/$type/$id');
+      if (response.statusCode != 200) {
+        throw Exception('error');
+      }
+      return response.data;
+    } catch (e) {
       return null;
     }
   }

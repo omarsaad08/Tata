@@ -5,15 +5,17 @@ Color clr(int colorNum) {
     case 0:
       return Colors.white;
     case 1:
-      return Color(0xffE26868);
+      return Color(0xff3fb6c8);
     case 2:
-      return Color(0xffFF8787);
+      return Color(0xffbbdaec);
     case 3:
-      return Color(0xfEDEDED);
+      return Color(0xff98e5f4);
     case 4:
-      return Color(0xffD8D9CF);
+      return Color(0xffe6b5fb);
     case 5:
-      return Color(0xffffffff);
+      return Color(0xffed87ab);
+    case 6:
+      return Color(0xffeed197);
   }
   return Colors.black;
 }

@@ -7,7 +7,7 @@ class UserSetup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: clr(5),
+      backgroundColor: clr(6),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -38,7 +38,7 @@ class UserSetup extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.all(32),
                 decoration: BoxDecoration(
-                    color: clr(4), borderRadius: BorderRadius.circular(30)),
+                    color: clr(5), borderRadius: BorderRadius.circular(30)),
                 child: Column(
                   children: [
                     Image.asset(
@@ -48,13 +48,12 @@ class UserSetup extends StatelessWidget {
                     SizedBox(
                       height: 16,
                     ),
-                    Text("مستشفى",
-                        style: TextStyle(color: clr(-1), fontSize: 28))
+                    Text("دكتور", style: TextStyle(color: clr(0), fontSize: 28))
                   ],
                 ),
               ),
               onTap: () {
-                Navigator.pushNamed(context, "hospitalSetup");
+                Navigator.pushNamed(context, "doctorSetup");
               },
             )
           ],

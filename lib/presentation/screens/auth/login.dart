@@ -33,7 +33,7 @@ class _LoginState extends State<Login> {
               padding:
                   EdgeInsets.only(top: 64, bottom: 32, left: 16, right: 16),
               decoration: BoxDecoration(
-                  color: clr(2),
+                  color: clr(1),
                   borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(25),
                       bottomRight: Radius.circular(25))),

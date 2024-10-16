@@ -3,13 +3,29 @@ import 'package:dio/dio.dart';
 import 'dart:convert';
 
 final dio = Dio();
-final baseUrl = "";
+final baseUrl = "http://192.168.103.224:3000";
 
 class BookingServices {
+  // testing
+  static Future<Map<String, dynamic>> fetchDoctorAvailability(
+      int doctorId) async {
+    final response = await dio.get('$baseUrl/doctorAvailability/week/1');
+
+    if (response.statusCode == 200) {
+      print('data: ${response.data}');
+      return response.data;
+    } else {
+      throw Exception('Failed to load availability');
+    }
+  }
+
+  // -------
   static Future<Map> bookADoctor(Map data) async {
     try {
-      Response response = await dio.post('$baseUrl/booking');
+      Response response =
+          await dio.post('http://192.168.103.224:3000/appointments');
       if (response.statusCode != 200) throw Exception(response.data);
+      print('data: ${response.data}');
       return response.data;
     } catch (e) {
       throw Exception("error bookinga  doctor's appointment: $e");

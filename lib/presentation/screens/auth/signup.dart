@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:tata/data/auth.dart';
+import 'package:tata/data/storage.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
 
+// import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class Signup extends StatefulWidget {
   const Signup({super.key});
 
@@ -11,6 +13,7 @@ class Signup extends StatefulWidget {
 }
 
 class _SignupState extends State<Signup> {
+  // final storage = FlutterSecureStorage();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool isPasswordVisible = false;
@@ -28,7 +31,7 @@ class _SignupState extends State<Signup> {
               padding:
                   EdgeInsets.only(top: 64, bottom: 32, left: 16, right: 16),
               decoration: BoxDecoration(
-                  color: clr(2),
+                  color: clr(1),
                   borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(25),
                       bottomRight: Radius.circular(25))),
@@ -106,10 +109,10 @@ class _SignupState extends State<Signup> {
                         child: mainElevatedButton(
                           "تسجيل الدخول",
                           () async {
-                            // Handle login logic
                             final user = await Auth.signupWithEmail(
                                 emailController.text, passwordController.text);
                             if (user == 0) {
+                              Storage.save('email', emailController.text);
                               Navigator.pushReplacementNamed(
                                   context, "userSetup");
                             } else if (user == 1) {
@@ -137,6 +140,7 @@ class _SignupState extends State<Signup> {
                     onPressed: () async {
                       final user = await Auth.signInWithGoogle();
                       if (user != null) {
+                        Storage.save('email', user.email!);
                         Navigator.pushReplacementNamed(context, "userSetup");
                       } else {
                         setState(() {
