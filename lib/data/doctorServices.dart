@@ -6,6 +6,16 @@ final dio = Dio();
 final baseUrl = "";
 
 class DoctorServices {
+  static Future<List> getAllDoctors() async {
+    try {
+      Response response = await dio.get('$baseUrl/doctor');
+      if (response.statusCode != 200) throw Exception(response.data);
+      return response.data;
+    } catch (e) {
+      throw Exception('error fetching docs: $e');
+    }
+  }
+
   static Future<Map> getDoctor() async {
     try {
       Response response = await dio.get('$baseUrl/doctor');

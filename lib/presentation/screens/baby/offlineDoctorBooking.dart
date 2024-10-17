@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tata/data/doctorServices.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
 
@@ -10,26 +11,6 @@ class OfflineDoctorBooking extends StatefulWidget {
 }
 
 class _OfflineDoctorBookingState extends State<OfflineDoctorBooking> {
-  final List<Map<String, String>> doctors = [
-    {
-      "name": "احمد محمد",
-      "speciality": "Cardiologist",
-      "experience": "10 سنين",
-      "imageUrl": "doctor-ahmed.png"
-    },
-    {
-      "name": "محمد مصطفى",
-      "speciality": "Dermatologist",
-      "experience": "5 سنين",
-      "imageUrl": "doctor-mohamed.png"
-    },
-    {
-      "name": "خالد احمد",
-      "speciality": "Pediatrician",
-      "experience": "8 سنين",
-      "imageUrl": "doctor-khalid.png"
-    },
-  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,15 +18,29 @@ class _OfflineDoctorBookingState extends State<OfflineDoctorBooking> {
             title: Text("حجز دكتور", style: TextStyle(color: clr(0))),
             centerTitle: true,
             backgroundColor: clr(1)),
-        body: ListView.builder(
-          itemCount: doctors.length,
-          itemBuilder: (context, index) {
-            return DoctorCard(
-              doctor: doctors[index],
-              onPressed: () {
-                // Navigate to the doctor's detail screen
-              },
-            );
+        body: FutureBuilder(
+          future: DoctorServices.getAllDoctors(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('خطأ: ${snapshot.error}'));
+            } else if (snapshot.hasData) {
+              final doctors = snapshot.data!;
+              return ListView.builder(
+                itemCount: doctors.length,
+                itemBuilder: (context, index) {
+                  return DoctorCard(
+                    doctor: doctors[index],
+                    onPressed: () {
+                      // Navigate to the doctor's detail screen
+                    },
+                  );
+                },
+              );
+            } else {
+              return Text("unknown error");
+            }
           },
         ));
   }
@@ -85,8 +80,10 @@ class DoctorCard extends StatelessWidget {
               ],
             ),
             Column(children: [
-              Image.asset(
-                'assets/${doctor["imageUrl"]!}',
+              Image.network(
+                doctor["imageUrl"] != null
+                    ? doctor["imageUrl"]!
+                    : "https://placehold.co/120x120",
                 width: 120,
               )
             ]),

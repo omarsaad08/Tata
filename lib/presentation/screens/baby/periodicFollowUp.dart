@@ -1,5 +1,11 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
+import 'package:tata/data/auth.dart';
+import 'package:tata/data/periodicFollowUpServices.dart';
+import 'package:tata/data/storage.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
+import 'package:tata/presentation/components/mainTextField.dart';
 import 'package:tata/presentation/components/theme.dart';
 import '../../../../utils/followUp.dart';
 
@@ -13,6 +19,8 @@ class PeriodicFollowUp extends StatefulWidget {
 class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
   String? selectedOption = '3';
   FollowUp followUp = FollowUp(3);
+  bool loading = false;
+  TextEditingController notesController = TextEditingController();
   void _handleCheckboxChange(
       int index, bool? value, List<Map<String, dynamic>> _checklistItems) {
     setState(() {
@@ -20,11 +28,48 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
     });
   }
 
+  void clearAllCheckboxes() {
+  setState(() {
+    // Reset motor milestones
+    for (var item in followUp.motorMilestones) {
+      item['isChecked'] = false;
+    }
+    // Reset sensory milestones
+    for (var item in followUp.sensoryMilestones) {
+      item['isChecked'] = false;
+    }
+    // Reset communication milestones
+    for (var item in followUp.communicationMilestones) {
+      item['isChecked'] = false;
+    }
+    // Reset feeding milestones
+    for (var item in followUp.feedingMilestones) {
+      item['isChecked'] = false;
+    }
+  });
+}
+
   void handleRadioChange(String value) {
     setState(() {
       selectedOption = value;
       followUp.setup(int.parse(value));
     });
+  }
+
+  int calculateAgeInMonths(DateTime birthDate) {
+    DateTime today = DateTime.now();
+
+    int yearsDifference = today.year - birthDate.year;
+    int monthsDifference = today.month - birthDate.month;
+
+    int totalMonths = (yearsDifference * 12) + monthsDifference;
+
+    // If the current day of the month is before the birth date, subtract one month
+    if (today.day < birthDate.day) {
+      totalMonths--;
+    }
+
+    return totalMonths;
   }
 
   @override
@@ -144,11 +189,51 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
                 );
               }).toList(),
             ),
-            mainElevatedButton("تم", () {
-              // send the data to the server to analyze it
+            SizedBox(
+              height: 12,
+            ),
+            mainTextField(notesController, 'ملاحظات', Icon(Icons.notes)),
+            SizedBox(
+              height: 12,
+            ),
+            mainElevatedButton("تم", () async {
+              setState(() {
+                loading = true;
+              });
+              try {
+                // send the data to the server to analyze it
+              final values = followUp.generateValues();
+              final basicData = await Storage.getIdAndType();
+              print('going to get the user from the server');
+              final user =
+                  await Auth.getUser(basicData['id'], basicData['type']);
+              print('got the user');
+              final data = {
+                "baby_id": (await Storage.getIdAndType())['id'],
+                "follow_up_date": DateTime.now().toLocal().toString().split(' ')[0],
+                "motorMilestones": values[0],
+                "feedingMilestones": values[1],
+                "communicationMilestones": values[2],
+                "sensoryMilestones": values[3],
+                "score": (followUp.generateScore() * 100).floor(),
+                // "ageInMonths": calculateAgeInMonths(user!['date_of_birth']),
+              };
 
-              Navigator.pushNamed(context, "followUpResult");
-            })
+              print('data: $data');
+              final result = await PeriodicFollowUpServices.addPeriodicFollowUp(data);
+              print('result: $result');
+              // Clear all checkboxes after submission
+              clearAllCheckboxes();
+              setState(() {
+                loading = false;
+              });
+              Navigator.pushNamed(context, "followUpResult", arguments: data['score']);
+              } catch (e) {
+                print(e);
+              }
+            }),
+            SizedBox(height: 8),
+            loading ? Center(child: Container(width: 40,child: CircularProgressIndicator(color: clr(1),))) : Container()
           ],
         ),
       ),

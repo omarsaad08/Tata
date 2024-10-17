@@ -92,6 +92,7 @@ class Auth {
       }
       return response.data;
     } catch (e) {
+      print(e);
       return null;
     }
   }

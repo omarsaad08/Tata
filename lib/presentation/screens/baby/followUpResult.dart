@@ -1,9 +1,14 @@
+/*
+  idea:
+  we can add an analysis to every single data that we took and generate a pdf file explaining with visuals everything to the mother.
+*/
 import 'package:flutter/material.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
 
 class FollowUpResult extends StatefulWidget {
-  const FollowUpResult({super.key});
+  final int score;
+  const FollowUpResult({super.key, required this.score});
 
   @override
   State<FollowUpResult> createState() => _FollowUpResultState();
@@ -29,7 +34,7 @@ class _FollowUpResultState extends State<FollowUpResult> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("2/5",
+                      Text("${widget.score}%",
                           style: TextStyle(
                               fontSize: 64,
                               fontWeight: FontWeight

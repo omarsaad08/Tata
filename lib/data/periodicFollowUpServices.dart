@@ -3,12 +3,12 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 
 final dio = Dio();
-final baseUrl = "";
+final baseUrl = "http://192.168.1.219:3000";
 
 class PeriodicFollowUpServices {
   static Future<Map> addPeriodicFollowUp(Map data) async {
     try {
-      Response response = await dio.post('$baseUrl/baby/periodicFollowUp');
+      Response response = await dio.post('$baseUrl/follow_up', data: data);
       if (response.statusCode != 200) {
         throw Exception(response.data);
       }

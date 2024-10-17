@@ -3,6 +3,11 @@ class FollowUp {
   late List<Map<String, dynamic>> feedingMilestones;
   late List<Map<String, dynamic>> communicationMilestones;
   late List<Map<String, dynamic>> sensoryMilestones;
+  List motorValues = [];
+  List feedingValues = [];
+  List communicationValues = [];
+  List sensoryValues = [];
+  int counter = 0;
   FollowUp(int age) {
     setup(age);
   }
@@ -314,6 +319,46 @@ class FollowUp {
         break;
       default:
     }
+  }
+
+  List generateValues() {
+    motorValues = [];
+    feedingValues = [];
+    communicationValues = [];
+    sensoryValues = [];
+    for (var milestone in motorMilestones) {
+      motorValues.add(milestone['isChecked']);
+    }
+    for (var milestone in feedingMilestones) {
+      feedingValues.add(milestone['isChecked']);
+    }
+    for (var milestone in communicationMilestones) {
+      communicationValues.add(milestone['isChecked']);
+    }
+    for (var milestone in sensoryMilestones) {
+      sensoryValues.add(milestone['isChecked']);
+    }
+    return [motorValues, feedingValues, communicationValues, sensoryValues];
+  }
+
+  double generateScore() {
+    for (var val in motorValues) {
+      val ? counter++ : null;
+    }
+    for (var val in communicationValues) {
+      val ? counter++ : null;
+    }
+    for (var val in sensoryValues) {
+      val ? counter++ : null;
+    }
+    for (var val in feedingValues) {
+      val ? counter++ : null;
+    }
+    return counter /
+        (motorValues.length +
+            communicationValues.length +
+            sensoryValues.length +
+            feedingValues.length);
   }
 }
 /*

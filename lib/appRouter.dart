@@ -44,7 +44,8 @@ class AppRouter {
       case "offlineDoctorBooking":
         return MaterialPageRoute(builder: (context) => OfflineDoctorBooking());
       case "followUpResult":
-        return MaterialPageRoute(builder: (context) => FollowUpResult());
+        final score = settings.arguments as int;
+        return MaterialPageRoute(builder: (context) => FollowUpResult(score: score));
       case "doctorBookingDetails":
         final doctor = settings.arguments as Map<String, String>;
         return MaterialPageRoute(

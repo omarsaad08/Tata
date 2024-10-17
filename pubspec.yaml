@@ -39,8 +39,13 @@ dependencies:
   firebase_auth: ^5.3.1
   flutter_localization: ^0.2.2
   google_sign_in: ^6.2.1
+  dio: ^5.7.0
+  agora_rtc_engine: ^6.3.2
+  permission_handler: ^11.3.1
+  flutter_secure_storage: ^4.2.1
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.13.1
   flutter_test:
     sdk: flutter
 
@@ -51,6 +56,10 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^3.0.0
 
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/app_icon.png"  # Path to your logo image
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
