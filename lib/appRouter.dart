@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tata/data/storage.dart';
 import 'package:tata/presentation/screens/auth/login.dart';
 import 'package:tata/presentation/screens/auth/signup.dart';
 import 'package:tata/presentation/screens/auth/userSetup.dart';
@@ -7,13 +8,17 @@ import "package:tata/presentation/screens/auth/babySetup.dart";
 import "package:tata/presentation/screens/auth/doctorSetup.dart";
 import 'package:tata/presentation/screens/baby/doctorAvailability.dart';
 import 'package:tata/presentation/screens/baby/doctorBookingDetails.dart';
+import 'package:tata/presentation/screens/baby/doctorTimeBooking.dart';
 import 'package:tata/presentation/screens/baby/followUpResult.dart';
+import 'package:tata/presentation/screens/baby/nextAppointment.dart';
 import 'package:tata/presentation/screens/baby/offlineDoctorBooking.dart';
 import 'package:tata/presentation/screens/baby/onlineDoctorBooking.dart';
 import 'package:tata/presentation/screens/baby/periodicFollowUp.dart';
 import 'package:tata/presentation/screens/baby/previousBookings.dart';
+import 'package:tata/presentation/screens/doctor/doctorAvailabilityInputScreen.dart';
 import 'package:tata/presentation/screens/doctor/doctorHome.dart';
 import 'package:tata/presentation/screens/doctor/doctorPreviousBookings.dart';
+import 'package:tata/presentation/screens/doctor/doctorSettings.dart';
 import 'package:tata/presentation/screens/doctor/doctorUpcomingBookings.dart';
 import 'package:tata/presentation/screens/doctor/notifications.dart';
 import 'package:tata/presentation/screens/doctor/offlineBook.dart';
@@ -45,9 +50,10 @@ class AppRouter {
         return MaterialPageRoute(builder: (context) => OfflineDoctorBooking());
       case "followUpResult":
         final score = settings.arguments as int;
-        return MaterialPageRoute(builder: (context) => FollowUpResult(score: score));
+        return MaterialPageRoute(
+            builder: (context) => FollowUpResult(score: score));
       case "doctorBookingDetails":
-        final doctor = settings.arguments as Map<String, String>;
+        final doctor = settings.arguments as Map;
         return MaterialPageRoute(
             builder: (context) => DoctorBookingDetails(doctor: doctor));
       case 'babyPreviousBookings':
@@ -74,6 +80,19 @@ class AppRouter {
         final int doctorId = settings.arguments as int;
         return MaterialPageRoute(
             builder: (context) => DoctorAvailabilityScreen(doctorId: doctorId));
+      case 'nextAppointment':
+        final data = settings.arguments as Map;
+        return MaterialPageRoute(
+            builder: (context) => NextAppointment(appointment: data));
+      case 'inputAvailability':
+        return MaterialPageRoute(
+            builder: (context) => DoctorAvailabilityInputScreen());
+      case 'doctorSettings':
+        return MaterialPageRoute(builder: (context) => DoctorSettings());
+      case 'doctorTimeBooking':
+        final doctorId = settings.arguments as int;
+        return MaterialPageRoute(
+            builder: (context) => DoctorTimeBooking(doctorId: doctorId));
       // case 'videoCall':
       // return MaterialPageRoute(builder: (context) => VideoCall());
     }

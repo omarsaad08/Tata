@@ -5,7 +5,7 @@ Widget mainElevatedButton(String text, VoidCallback onPressed, {Color? color}) {
   return ElevatedButton(
     style: ElevatedButton.styleFrom(
         backgroundColor: color == null ? clr(1) : color,
-        padding: EdgeInsets.symmetric(vertical: 8)),
+        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16)),
     onPressed: onPressed,
     child: Text(
       text,

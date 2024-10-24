@@ -3,7 +3,7 @@ import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
 
 class DoctorBookingDetails extends StatefulWidget {
-  final Map<String, String> doctor;
+  final Map doctor;
 
   DoctorBookingDetails({required this.doctor});
 
@@ -16,7 +16,11 @@ class _DoctorBookingDetailsState extends State<DoctorBookingDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text(widget.doctor["name"]!, style: TextStyle(color: clr(0))),
+          title: Text(
+              widget.doctor["name"] != null
+                  ? widget.doctor["name"]
+                  : "محمد محمد",
+              style: TextStyle(color: clr(0))),
           centerTitle: true,
           backgroundColor: clr(1)),
       body: Container(
@@ -27,7 +31,6 @@ class _DoctorBookingDetailsState extends State<DoctorBookingDetails> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Doctor's image
-              Image.asset("assets/${widget.doctor["imageUrl"]!}", width: 120),
               SizedBox(height: 20),
               Container(
                 padding: EdgeInsets.all(12),
@@ -41,7 +44,9 @@ class _DoctorBookingDetailsState extends State<DoctorBookingDetails> {
                   children: [
                     // Doctor's name
                     Text(
-                      widget.doctor["name"]!,
+                      widget.doctor["name"] != null
+                          ? widget.doctor['name']
+                          : "محمد محمد",
                       style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -70,9 +75,6 @@ class _DoctorBookingDetailsState extends State<DoctorBookingDetails> {
                   ],
                 ),
               ),
-              SizedBox(height: 20),
-              // ###### booking time ######
-              Text("الموعد الفارغ القادم: 10/10/2024 الساعة 10:30 AM"),
               SizedBox(
                 height: 12,
               ),
@@ -87,7 +89,7 @@ class _DoctorBookingDetailsState extends State<DoctorBookingDetails> {
                   Expanded(
                       child: mainElevatedButton("حجز", () {
                     Navigator.pushNamed(context, 'doctorAvailability',
-                        arguments: 1);
+                        arguments: widget.doctor['id']);
                   }))
                 ],
               )

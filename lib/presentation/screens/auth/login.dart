@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tata/data/auth.dart';
+import 'package:tata/data/storage.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
 
@@ -15,18 +16,13 @@ class _LoginState extends State<Login> {
   TextEditingController passwordController = TextEditingController();
   bool isPasswordVisible = false;
   String? errorMessage = null;
+  String _selectedOption = "طفل";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text("تسجيل الدخول", style: TextStyle(color: clr(0))),
-      //   centerTitle: true,
-      //   backgroundColor: clr(2),
-      // ),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 0),
-        child: Column(
-          // mainAxisAlignment: MainAxisAlignment.center,
+        child: ListView(
           children: [
             Container(
               width: double.infinity,
@@ -113,6 +109,38 @@ class _LoginState extends State<Login> {
                   ),
                   const SizedBox(height: 8),
                   errorMessage != null ? Text(errorMessage!) : Container(),
+                  Row(
+                    children: [
+                      Row(
+                        children: [
+                          Radio<String>(
+                            value: 'دكتور',
+                            groupValue: _selectedOption,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedOption = value!;
+                              });
+                            },
+                          ),
+                          const Text('دكتور'),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Radio<String>(
+                            value: "طفل",
+                            groupValue: _selectedOption,
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedOption = value!;
+                              });
+                            },
+                          ),
+                          const Text('طفل'),
+                        ],
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 24),
                   Row(
                     children: [
@@ -122,8 +150,21 @@ class _LoginState extends State<Login> {
                           final user = await Auth.signinWithEmail(
                               emailController.text, passwordController.text);
                           if (user != null) {
-                            Navigator.pushReplacementNamed(
-                                context, "userSetup");
+                            await Storage.save('email', emailController.text);
+                            // get user data
+                            final result = await Auth.getUserWithEmail(
+                                emailController.text,
+                                _selectedOption == "دكتور" ? "doctor" : "baby");
+                            if (result != null) {
+                              await Storage.save('id', result['id'].toString());
+                              await Storage.save(
+                                  'type',
+                                  _selectedOption == "دكتور"
+                                      ? "doctor"
+                                      : "baby");
+                              Navigator.pushReplacementNamed(context,
+                                  "${_selectedOption == "دكتور" ? "doctor" : "baby"}Home");
+                            }
                           } else {
                             setState(() {
                               errorMessage =
@@ -140,6 +181,7 @@ class _LoginState extends State<Login> {
                     onPressed: () async {
                       final user = await Auth.signInWithGoogle();
                       if (user != null) {
+                        await Storage.save('email', user.email!);
                         Navigator.pushReplacementNamed(context, "userSetup");
                       } else {
                         setState(() {

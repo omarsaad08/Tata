@@ -23,7 +23,7 @@ class _SignupState extends State<Signup> {
     return Scaffold(
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 0),
-        child: Column(
+        child: ListView(
           // mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
@@ -112,7 +112,7 @@ class _SignupState extends State<Signup> {
                             final user = await Auth.signupWithEmail(
                                 emailController.text, passwordController.text);
                             if (user == 0) {
-                              Storage.save('email', emailController.text);
+                              await Storage.save('email', emailController.text);
                               Navigator.pushReplacementNamed(
                                   context, "userSetup");
                             } else if (user == 1) {
@@ -140,7 +140,7 @@ class _SignupState extends State<Signup> {
                     onPressed: () async {
                       final user = await Auth.signInWithGoogle();
                       if (user != null) {
-                        Storage.save('email', user.email!);
+                        await Storage.save('email', user.email!);
                         Navigator.pushReplacementNamed(context, "userSetup");
                       } else {
                         setState(() {

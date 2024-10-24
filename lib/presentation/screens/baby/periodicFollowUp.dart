@@ -1,4 +1,4 @@
-import 'dart:ffi';
+// import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:tata/data/auth.dart';
@@ -29,25 +29,25 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
   }
 
   void clearAllCheckboxes() {
-  setState(() {
-    // Reset motor milestones
-    for (var item in followUp.motorMilestones) {
-      item['isChecked'] = false;
-    }
-    // Reset sensory milestones
-    for (var item in followUp.sensoryMilestones) {
-      item['isChecked'] = false;
-    }
-    // Reset communication milestones
-    for (var item in followUp.communicationMilestones) {
-      item['isChecked'] = false;
-    }
-    // Reset feeding milestones
-    for (var item in followUp.feedingMilestones) {
-      item['isChecked'] = false;
-    }
-  });
-}
+    setState(() {
+      // Reset motor milestones
+      for (var item in followUp.motorMilestones) {
+        item['isChecked'] = false;
+      }
+      // Reset sensory milestones
+      for (var item in followUp.sensoryMilestones) {
+        item['isChecked'] = false;
+      }
+      // Reset communication milestones
+      for (var item in followUp.communicationMilestones) {
+        item['isChecked'] = false;
+      }
+      // Reset feeding milestones
+      for (var item in followUp.feedingMilestones) {
+        item['isChecked'] = false;
+      }
+    });
+  }
 
   void handleRadioChange(String value) {
     setState(() {
@@ -202,38 +202,48 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
               });
               try {
                 // send the data to the server to analyze it
-              final values = followUp.generateValues();
-              final basicData = await Storage.getIdAndType();
-              print('going to get the user from the server');
-              final user =
-                  await Auth.getUser(basicData['id'], basicData['type']);
-              print('got the user');
-              final data = {
-                "baby_id": (await Storage.getIdAndType())['id'],
-                "follow_up_date": DateTime.now().toLocal().toString().split(' ')[0],
-                "motorMilestones": values[0],
-                "feedingMilestones": values[1],
-                "communicationMilestones": values[2],
-                "sensoryMilestones": values[3],
-                "score": (followUp.generateScore() * 100).floor(),
-                // "ageInMonths": calculateAgeInMonths(user!['date_of_birth']),
-              };
+                final values = followUp.generateValues();
+                final basicData = await Storage.getIdAndType();
+                print('going to get the user from the server');
+                final user =
+                    await Auth.getUser(basicData['id'], basicData['type']);
+                print('got the user');
+                final data = {
+                  "baby_id": (await Storage.getIdAndType())['id'],
+                  "follow_up_date":
+                      DateTime.now().toLocal().toString().split(' ')[0],
+                  "motorMilestones": values[0],
+                  "feedingMilestones": values[1],
+                  "communicationMilestones": values[2],
+                  "sensoryMilestones": values[3],
+                  "score": (followUp.generateScore() * 100).floor(),
+                  // "ageInMonths": calculateAgeInMonths(user!['date_of_birth']),
+                };
 
-              print('data: $data');
-              final result = await PeriodicFollowUpServices.addPeriodicFollowUp(data);
-              print('result: $result');
-              // Clear all checkboxes after submission
-              clearAllCheckboxes();
-              setState(() {
-                loading = false;
-              });
-              Navigator.pushNamed(context, "followUpResult", arguments: data['score']);
+                print('data: $data');
+                final result =
+                    await PeriodicFollowUpServices.addPeriodicFollowUp(data);
+                print('result: $result');
+                // Clear all checkboxes after submission
+                clearAllCheckboxes();
+                setState(() {
+                  loading = false;
+                });
+                Navigator.pushNamed(context, "followUpResult",
+                    arguments: data['score']);
               } catch (e) {
                 print(e);
               }
             }),
             SizedBox(height: 8),
-            loading ? Center(child: Container(width: 40,child: CircularProgressIndicator(color: clr(1),))) : Container()
+            loading
+                ? Center(
+                    child: Container(
+                        width: 40,
+                        child: CircularProgressIndicator(
+                          color: clr(1),
+                        )))
+                : Container()
           ],
         ),
       ),

@@ -3,13 +3,17 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 
 final dio = Dio();
-final baseUrl = "";
+final baseUrl = "http://192.168.1.11:3000";
 
 class DoctorServices {
   static Future<List> getAllDoctors() async {
     try {
+      print('going to get data');
       Response response = await dio.get('$baseUrl/doctor');
-      if (response.statusCode != 200) throw Exception(response.data);
+      if (response.statusCode != 200) {
+        throw Exception(response.data);
+      }
+      print('doctors: ${response.data}');
       return response.data;
     } catch (e) {
       throw Exception('error fetching docs: $e');

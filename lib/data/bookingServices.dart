@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
 
+import 'package:tata/data/storage.dart';
+
 final dio = Dio();
-final baseUrl = "http://192.168.103.224:3000";
+final baseUrl = "http://192.168.1.11:3000";
 
 class BookingServices {
   // testing
@@ -19,11 +21,60 @@ class BookingServices {
     }
   }
 
+  static Future<void> postDoctorAvailability(List data) async {
+    final response = await dio.post('$baseUrl/doctorAvailability', data: data);
+
+    if (response.statusCode == 200) {
+      print('data: ${response.data}');
+      return response.data;
+    } else {
+      throw Exception('Failed to post availability');
+    }
+  }
+
+  static Future<Map?> getNextAppointmentForBaby() async {
+    final id = await Storage.get('id');
+    try {
+      Response response = await dio.get('$baseUrl/appointments/next/$id');
+      if (response.statusCode != 200) {
+        throw Exception('failed: ');
+      }
+      print('${response.data}');
+      Response doctorResponse =
+          await dio.get('$baseUrl/doctor/${response.data['doctor_id']}');
+      if (doctorResponse.statusCode != 200) {
+        throw Exception('failed: ');
+      }
+      final data = Map.from(response.data);
+      data.addAll(doctorResponse.data);
+      print('data: $data');
+      return data;
+    } catch (e) {
+      throw Exception('error getting next appointment: ${e}');
+    }
+  }
+
+  static Future<Map?> getDoctorAvailability(int doctorId) async {
+    try {
+      final response =
+          await dio.get('$baseUrl/doctorAvailability/week/${doctorId}');
+      if (response.statusCode == 200) {
+        print('data: ${response.data}');
+        final data = response.data['availability'];
+        final booked = response.data['bookedAppointments'];
+        return response.data;
+      } else {
+        throw Exception('Failed to load availability');
+      }
+    } catch (error) {
+      return null;
+    }
+  }
+
   // -------
   static Future<Map> bookADoctor(Map data) async {
     try {
-      Response response =
-          await dio.post('http://192.168.103.224:3000/appointments');
+      Response response = await dio.post('$baseUrl/appointments', data: data);
       if (response.statusCode != 200) throw Exception(response.data);
       print('data: ${response.data}');
       return response.data;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tata/data/doctorServices.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
+import 'package:tata/presentation/components/mainTextField.dart';
 import 'package:tata/presentation/components/theme.dart';
 
 class OfflineDoctorBooking extends StatefulWidget {
@@ -11,6 +12,7 @@ class OfflineDoctorBooking extends StatefulWidget {
 }
 
 class _OfflineDoctorBookingState extends State<OfflineDoctorBooking> {
+  TextEditingController searchController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,16 +30,35 @@ class _OfflineDoctorBookingState extends State<OfflineDoctorBooking> {
             } else if (snapshot.hasData) {
               final doctors = snapshot.data!;
               return ListView.builder(
-                itemCount: doctors.length,
-                itemBuilder: (context, index) {
-                  return DoctorCard(
+          itemCount: doctors.length,
+          itemBuilder: (context, index) {
+            if (index == 0) {
+              return Column(
+                children: [
+                  SizedBox(),
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    child: mainTextField(
+                        searchController, "بحث عن دكتور", Icon(Icons.search)),
+                  ),
+                  DoctorCard(
                     doctor: doctors[index],
                     onPressed: () {
                       // Navigate to the doctor's detail screen
                     },
-                  );
+                  ),
+                ],
+              );
+            } else {
+              return DoctorCard(
+                doctor: doctors[index],
+                onPressed: () {
+                  // Navigate to the doctor's detail screen
                 },
               );
+            }
+          },
+        );
             } else {
               return Text("unknown error");
             }
@@ -47,7 +68,7 @@ class _OfflineDoctorBookingState extends State<OfflineDoctorBooking> {
 }
 
 class DoctorCard extends StatelessWidget {
-  final Map<String, String> doctor;
+  final Map doctor;
   final VoidCallback onPressed;
 
   DoctorCard({required this.doctor, required this.onPressed});
@@ -59,34 +80,46 @@ class DoctorCard extends StatelessWidget {
       color: clr(2),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
           children: [
-            Column(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Display the doctor's name
-                Text(
-                  doctor["name"]!,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Column(
+                  children: [
+                    // Display the doctor's name
+                    Text(
+                      doctor["name"] != null ? doctor['name'] : "محمد محمد",
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    // Display the doctor's experience
+                    Text("الخبرة: ${doctor["experience"]}"),
+                    SizedBox(height: 10),
+                    // Button to open the detailed screen
+                    
+                  ],
                 ),
-                // Display the doctor's experience
-                Text("الخبرة: ${doctor["experience"]}"),
-                SizedBox(height: 10),
-                // Button to open the detailed screen
-                mainElevatedButton("تفاصيل", () {
-                  Navigator.pushNamed(context, "doctorBookingDetails",
-                      arguments: doctor);
-                }),
+                Column(
+                  children: [
+                    Text(
+                      doctor['city'],
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    Text(
+                      doctor['address'],
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ],
+                ),
+                
               ],
             ),
-            Column(children: [
-              Image.network(
-                doctor["imageUrl"] != null
-                    ? doctor["imageUrl"]!
-                    : "https://placehold.co/120x120",
-                width: 120,
-              )
-            ]),
+            Row(children: [
+              Expanded(child: mainElevatedButton("تفاصيل", () {
+                  Navigator.pushNamed(context, "doctorBookingDetails",
+                      arguments: doctor);
+                }),)
+            ],)
           ],
         ),
       ),

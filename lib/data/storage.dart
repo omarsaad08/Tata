@@ -22,4 +22,9 @@ class Storage {
     final value = await storage.read(key: key);
     return value;
   }
+
+  static Future<void> deleteIdAndType() async {
+    await storage.delete(key: 'id');
+    await storage.delete(key: 'type');
+  }
 }

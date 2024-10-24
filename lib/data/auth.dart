@@ -7,7 +7,7 @@ import 'package:dio/dio.dart';
 final auth = FirebaseAuth.instance;
 final googleSignIn = GoogleSignIn();
 final dio = Dio();
-final baseUrl = 'http://192.168.1.219:3000';
+final baseUrl = 'http://192.168.1.11:3000';
 
 class Auth {
   static Future<int?> signupWithEmail(String email, String password) async {
@@ -93,6 +93,18 @@ class Auth {
       return response.data;
     } catch (e) {
       print(e);
+      return null;
+    }
+  }
+
+  static Future<Map?> getUserWithEmail(String email, String type) async {
+    try {
+      Response response = await dio.get('$baseUrl/$type/email/$email');
+      if (response.statusCode != 200) {
+        throw Exception("error");
+      }
+      return response.data;
+    } catch (e) {
       return null;
     }
   }

@@ -23,7 +23,7 @@ void main() async {
     } else if (data['type'] == 'doctor') {
       route = 'doctorHome';
     } else {
-      route = 'userSetup';
+      route = 'signup';
     }
   } else {
     route = 'signup';
@@ -50,7 +50,8 @@ class MainApp extends StatelessWidget {
         // onPrimary: clr(5),
         // onSurface: clr(1),
       )),
-      initialRoute: 'periodicFollowUp',
+      initialRoute: route,
+      // initialRoute: "inputAvailability",
       onGenerateRoute: appRouter.generateRoute,
       // for making the app RTL
       localizationsDelegates: [

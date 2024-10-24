@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 
 final dio = Dio();
-final baseUrl = "http://192.168.1.219:3000";
+final baseUrl = "http://192.168.1.11:3000";
 
 class PeriodicFollowUpServices {
   static Future<Map> addPeriodicFollowUp(Map data) async {
