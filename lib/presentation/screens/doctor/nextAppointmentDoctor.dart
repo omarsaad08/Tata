@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
 
-class NextAppointment extends StatefulWidget {
+class NextAppointmentDoctor extends StatefulWidget {
   final Map appointment;
-  NextAppointment({super.key, required this.appointment});
+  NextAppointmentDoctor({super.key, required this.appointment});
 
   @override
-  State<NextAppointment> createState() => NextAppointmentState();
+  State<NextAppointmentDoctor> createState() => NextAppointmentDoctorState();
 }
 
-class NextAppointmentState extends State<NextAppointment> {
+class NextAppointmentDoctorState extends State<NextAppointmentDoctor> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,7 +67,11 @@ class NextAppointmentState extends State<NextAppointment> {
                   children: [
                     Expanded(
                       child: mainElevatedButton("الاتصال", () async {
-                        // Navigator.push(context, MaterialPageRoute(builder: (context) => VideoCall()));
+                        Navigator.pushNamed(context, "videoCall", arguments: {
+                          "channelName":
+                              "appointment_${widget.appointment['appointment_id']}",
+                          "uid": widget.appointment['baby_id']
+                        });
                       }, color: clr(1)),
                     ),
                   ],

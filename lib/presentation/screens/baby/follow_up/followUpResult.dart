@@ -7,8 +7,8 @@ import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
 
 class FollowUpResult extends StatefulWidget {
-  final int score;
-  const FollowUpResult({super.key, required this.score});
+  final bool healthy;
+  const FollowUpResult({super.key, required this.healthy});
 
   @override
   State<FollowUpResult> createState() => _FollowUpResultState();
@@ -30,19 +30,14 @@ class _FollowUpResultState extends State<FollowUpResult> {
                 child: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                      color: clr(2), borderRadius: BorderRadius.circular(12)),
+                      color: clr(0), borderRadius: BorderRadius.circular(12)),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("${widget.score}%",
-                          style: TextStyle(
-                              fontSize: 64,
-                              fontWeight: FontWeight
-                                  .bold)), // here should be the score of the periodic follow up
-                      SizedBox(
-                        height: 32,
-                      ),
-                      Text("طفلك يحتاج لزيارة طبيب",
+                      Text(
+                          widget.healthy
+                              ? "طفلك ينمو بشكل سليم"
+                              : "طفلك يحتاج لزيارة طبيب",
                           style: TextStyle(
                               fontSize: 24)), // here should be the description
                       SizedBox(
@@ -59,13 +54,6 @@ class _FollowUpResultState extends State<FollowUpResult> {
                                   context, "offlineDoctorBooking");
                             }),
                           ),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          Expanded(
-                              child: mainElevatedButton("احجز اونلاين", () {
-                            Navigator.pushNamed(context, "onlineDoctorBooking");
-                          })),
                           SizedBox(
                             width: 8,
                           ),

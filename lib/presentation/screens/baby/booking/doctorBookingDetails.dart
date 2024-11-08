@@ -25,7 +25,7 @@ class _DoctorBookingDetailsState extends State<DoctorBookingDetails> {
           backgroundColor: clr(1)),
       body: Container(
         padding: const EdgeInsets.all(16.0),
-        color: clr(2),
+        color: clr(0),
         child: Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -65,7 +65,7 @@ class _DoctorBookingDetailsState extends State<DoctorBookingDetails> {
                     SizedBox(height: 10),
                     // Doctor's experience
                     Text(
-                      "الخبرة: ${widget.doctor["experience"]}",
+                      "الخبرة: ${widget.doctor["experience"] ?? 0}",
                       style: TextStyle(fontSize: 18, color: clr(0)),
                     ),
                     SizedBox(height: 20),
@@ -78,19 +78,13 @@ class _DoctorBookingDetailsState extends State<DoctorBookingDetails> {
               SizedBox(
                 height: 12,
               ),
-              Row(children: [
-                Expanded(
-                  child:
-                      mainElevatedButton("تغيير الموعد", () {}, color: clr(5)),
-                )
-              ]),
               Row(
                 children: [
                   Expanded(
                       child: mainElevatedButton("حجز", () {
                     Navigator.pushNamed(context, 'doctorAvailability',
                         arguments: widget.doctor['id']);
-                  }))
+                  }, color: clr(5)))
                 ],
               )
             ],

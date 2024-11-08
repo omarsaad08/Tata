@@ -7,6 +7,11 @@ class FollowUp {
   List feedingValues = [];
   List communicationValues = [];
   List sensoryValues = [];
+  int motorCounter = 0;
+  int feedingCounter = 0;
+  int communicationCounter = 0;
+  int sensoryCounter = 0;
+  bool healthy = true;
   int counter = 0;
   FollowUp(int age) {
     setup(age);
@@ -326,18 +331,33 @@ class FollowUp {
     feedingValues = [];
     communicationValues = [];
     sensoryValues = [];
+    motorCounter = 0;
+    feedingCounter = 0;
+    communicationCounter = 0;
+    sensoryCounter = 0;
     for (var milestone in motorMilestones) {
       motorValues.add(milestone['isChecked']);
+      milestone['isChecked'] ? null : motorCounter++;
     }
     for (var milestone in feedingMilestones) {
       feedingValues.add(milestone['isChecked']);
+      milestone['isChecked'] ? null : feedingCounter++;
     }
     for (var milestone in communicationMilestones) {
       communicationValues.add(milestone['isChecked']);
+      milestone['isChecked'] ? null : communicationCounter++;
     }
     for (var milestone in sensoryMilestones) {
       sensoryValues.add(milestone['isChecked']);
+      milestone['isChecked'] ? null : sensoryCounter++;
     }
+    if (motorCounter > 2 ||
+        feedingCounter > 1 ||
+        communicationCounter > 1 ||
+        sensoryCounter > 1) {
+      healthy = false;
+    }
+    // print([motorCounter, feedingCounter, communicationCounter, sensoryCounter]);
     return [motorValues, feedingValues, communicationValues, sensoryValues];
   }
 

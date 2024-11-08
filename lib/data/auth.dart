@@ -5,9 +5,15 @@ import 'package:tata/data/storage.dart';
 import 'package:dio/dio.dart';
 
 final auth = FirebaseAuth.instance;
-final googleSignIn = GoogleSignIn();
+final googleSignIn = GoogleSignIn(
+  scopes: [
+    'email',
+    'https://www.googleapis.com/auth/calendar', // Full access to user's calendar
+    'https://www.googleapis.com/auth/calendar.events', // Access to create and modify events
+  ],
+);
 final dio = Dio();
-final baseUrl = 'http://192.168.1.11:3000';
+final baseUrl = 'http://192.168.1.219:3000';
 
 class Auth {
   static Future<int?> signupWithEmail(String email, String password) async {

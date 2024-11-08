@@ -7,7 +7,7 @@ import 'package:tata/data/storage.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/mainTextField.dart';
 import 'package:tata/presentation/components/theme.dart';
-import '../../../../utils/followUp.dart';
+import '../../../../models/followUp.dart';
 
 class PeriodicFollowUp extends StatefulWidget {
   const PeriodicFollowUp({super.key});
@@ -121,7 +121,6 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
             ),
             SizedBox(height: 8),
             ExpansionTile(
-              backgroundColor: clr(2),
               initiallyExpanded: true,
               title:
                   Text("علامات النمو الحركية"), // Title of the foldable section
@@ -196,6 +195,9 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
             SizedBox(
               height: 12,
             ),
+            mainElevatedButton("العلامات التحذيرية", () {
+              Navigator.pushNamed(context, 'warningSigns');
+            }, color: clr(5)),
             mainElevatedButton("تم", () async {
               setState(() {
                 loading = true;
@@ -216,8 +218,11 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
                   "feedingMilestones": values[1],
                   "communicationMilestones": values[2],
                   "sensoryMilestones": values[3],
-                  "score": (followUp.generateScore() * 100).floor(),
-                  // "ageInMonths": calculateAgeInMonths(user!['date_of_birth']),
+                  // "score": (followUp.generateScore() * 100).floor(),
+                  "healthy": followUp.healthy,
+                  // "ageInMonths":
+                  //     calculateAgeInMonths(DateTime(user!['date_of_birth'])),
+                  "notes": notesController.text,
                 };
 
                 print('data: $data');
@@ -230,7 +235,7 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
                   loading = false;
                 });
                 Navigator.pushNamed(context, "followUpResult",
-                    arguments: data['score']);
+                    arguments: data['healthy']);
               } catch (e) {
                 print(e);
               }

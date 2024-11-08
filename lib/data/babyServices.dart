@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import 'dart:convert';
 
 final dio = Dio();
-final baseUrl = "";
+final baseUrl = "192.168.1.219";
 
 class BabyServices {
   static Future<Map?> getBaby(String email) async {

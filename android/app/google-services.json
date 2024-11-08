@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "583073638100",
+    "project_id": "tata-5e72c",
+    "storage_bucket": "tata-5e72c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:583073638100:android:ad750b2c7fc65ac8603d41",
+        "android_client_info": {
+          "package_name": "com.example.tata"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBn_am4hiAq6IV1vq2xzP1iK0Xp4rzqmWw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

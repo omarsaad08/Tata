@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tata/data/storage.dart';
 import 'package:tata/firebase_options.dart';
 import 'package:tata/presentation/components/theme.dart';
@@ -17,7 +19,7 @@ void main() async {
   // routing
   if (user != null) {
     final data = await Storage.getIdAndType();
-    print('data: ${data}');
+    print('user: ${data}');
     if (data['type'] == 'baby') {
       route = 'babyHome';
     } else if (data['type'] == 'doctor') {
@@ -28,6 +30,7 @@ void main() async {
   } else {
     route = 'signup';
   }
+
   runApp(MainApp(
     appRouter: AppRouter(),
   ));
@@ -42,16 +45,14 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-          // fontFamily: "Hacen-Liner-Print-out",
-          // fontFamily: "Cairo",
-          // fontFamily: "NotoNaskhArabic",
+          fontFamily: "NotoSansArabic",
           colorScheme: ColorScheme.light(
-        primary: clr(1),
-        // onPrimary: clr(5),
-        // onSurface: clr(1),
-      )),
-      initialRoute: route,
-      // initialRoute: "inputAvailability",
+            primary: clr(1),
+            // onPrimary: clr(5),
+            // onSurface: clr(1),
+          )),
+      // initialRoute: route,
+      initialRoute: "bookingPayment",
       onGenerateRoute: appRouter.generateRoute,
       // for making the app RTL
       localizationsDelegates: [

@@ -3,6 +3,7 @@ import 'dart:convert'; // For JSON decoding
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:tata/data/bookingServices.dart';
+import 'package:tata/data/paymentServices.dart';
 import 'package:tata/data/storage.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart'; // For date formatting
@@ -26,7 +27,7 @@ class _DoctorAvailabilityScreenState extends State<DoctorAvailabilityScreen> {
   String? selectedDate;
   String? selectedTime;
   Map? bookingResponse;
-
+  String? onlineOrOffline;
   // Arabic names for the days and months
   final List<String> arabicDays = [
     'الإثنين',
@@ -62,7 +63,7 @@ class _DoctorAvailabilityScreenState extends State<DoctorAvailabilityScreen> {
   Future<void> fetchDoctorAvailability() async {
     try {
       final response = await http.get(Uri.parse(
-          'http://192.168.1.11:3000/doctorAvailability/week/${widget.doctorId}'));
+          'http://192.168.1.219:3000/doctorAvailability/week/${widget.doctorId}'));
       if (response.statusCode == 200) {
         print('data: ${response.body}');
         final data = jsonDecode(response.body);
@@ -158,7 +159,6 @@ class _DoctorAvailabilityScreenState extends State<DoctorAvailabilityScreen> {
                             return slot['weekday'] ==
                                 weekday; // Match the weekday directly
                           }).toList();
-
                           return Container(
                             margin: EdgeInsets.all(8.0),
                             padding: EdgeInsets.all(12),
@@ -190,44 +190,115 @@ class _DoctorAvailabilityScreenState extends State<DoctorAvailabilityScreen> {
                                           List<String> timeSlots =
                                               generateTimeSlots(
                                                   startTime, endTime);
-                                          return Row(
+                                          return Column(
                                             children: [
-                                              Expanded(
-                                                child: DropdownButton<String>(
-                                                  hint: Text('اختر موعدًا',
-                                                      style: TextStyle(
-                                                          color: clr(
-                                                              0))), // Select time hint in Arabic
-                                                  value: selectedTime,
-                                                  onChanged: (value) {
-                                                    selectTimeSlot(
-                                                        currentDate, value!);
-                                                  },
-                                                  items:
-                                                      timeSlots.map((timeSlot) {
-                                                    bool isBooked =
-                                                        isTimeSlotBooked(
-                                                            currentDate,
-                                                            timeSlot);
-                                                    return DropdownMenuItem<
-                                                        String>(
-                                                      value: isBooked
-                                                          ? null
-                                                          : timeSlot,
-                                                      child: Text(
-                                                        isBooked
-                                                            ? '$timeSlot (محجوز)' // Booked label in Arabic
-                                                            : timeSlot,
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                      child: DropdownButton<
+                                                          String>(
+                                                    hint: Text('اختر موعدًا',
                                                         style: TextStyle(
-                                                          color: isBooked
-                                                              ? Colors.grey
-                                                              : Colors.black,
+                                                            color: clr(0))),
+                                                    value: timeSlots.contains(
+                                                                selectedTime) &&
+                                                            !isTimeSlotBooked(
+                                                                currentDate,
+                                                                selectedTime!)
+                                                        ? selectedTime
+                                                        : null, // Set to null if the selected time isn't available
+                                                    onChanged: (value) {
+                                                      selectTimeSlot(
+                                                          currentDate, value!);
+                                                    },
+                                                    items: timeSlots
+                                                        .map((timeSlot) {
+                                                      bool isBooked =
+                                                          isTimeSlotBooked(
+                                                              currentDate,
+                                                              timeSlot);
+                                                      return DropdownMenuItem<
+                                                          String>(
+                                                        value: isBooked
+                                                            ? null
+                                                            : timeSlot, // Set `value` to null for booked slots
+                                                        child: Text(
+                                                          isBooked
+                                                              ? '$timeSlot (محجوز)'
+                                                              : timeSlot,
+                                                          style: TextStyle(
+                                                            color: isBooked
+                                                                ? Colors.grey
+                                                                : Colors.black,
+                                                          ),
                                                         ),
-                                                      ),
-                                                    );
-                                                  }).toList(),
-                                                ),
+                                                      );
+                                                    }).toList(),
+                                                  )),
+                                                ],
                                               ),
+                                              Container(
+                                                // padding: EdgeInsets.all(8),
+                                                decoration: BoxDecoration(
+                                                    color: clr(2),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12)),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: <Widget>[
+                                                    slot['online']
+                                                        ? Expanded(
+                                                            child:
+                                                                RadioListTile<
+                                                                    String>(
+                                                              title: Text(
+                                                                  'اونلاين',
+                                                                  style: TextStyle(
+                                                                      color: clr(
+                                                                          0))),
+                                                              value: 'online',
+                                                              groupValue:
+                                                                  onlineOrOffline,
+                                                              onChanged:
+                                                                  (String?
+                                                                      value) {
+                                                                setState(() {
+                                                                  onlineOrOffline =
+                                                                      value!;
+                                                                });
+                                                              },
+                                                            ),
+                                                          )
+                                                        : Container(),
+                                                    slot['offline']
+                                                        ? Expanded(
+                                                            child:
+                                                                RadioListTile<
+                                                                    String>(
+                                                              title: Text(
+                                                                  'اوفلاين',
+                                                                  style: TextStyle(
+                                                                      color: clr(
+                                                                          0))),
+                                                              value: 'offline',
+                                                              groupValue:
+                                                                  onlineOrOffline,
+                                                              onChanged:
+                                                                  (String?
+                                                                      value) {
+                                                                setState(() {
+                                                                  onlineOrOffline =
+                                                                      value!;
+                                                                });
+                                                              },
+                                                            ),
+                                                          )
+                                                        : Container(),
+                                                  ],
+                                                ),
+                                              )
                                             ],
                                           );
                                         }).toList(),
@@ -247,11 +318,13 @@ class _DoctorAvailabilityScreenState extends State<DoctorAvailabilityScreen> {
                           children: [
                             Text('التاريخ المختار: $selectedDate',
                                 style: TextStyle(
-                                    fontSize: 18)), // Selected date in Arabic
+                                    fontSize: 18,
+                                    color: clr(0))), // Selected date in Arabic
                             SizedBox(height: 8),
                             Text('الوقت المختار: $selectedTime',
                                 style: TextStyle(
-                                    fontSize: 18)), // Selected time in Arabic
+                                    fontSize: 18,
+                                    color: clr(0))), // Selected time in Arabic
                             SizedBox(height: 20),
                             Row(
                               children: [
@@ -264,12 +337,16 @@ class _DoctorAvailabilityScreenState extends State<DoctorAvailabilityScreen> {
                                       final data = {
                                         "baby_id": baby_id,
                                         "doctor_id": widget.doctorId,
-                                        "appointment_date": selectedDate,
+                                        "appointment_date": selectedDate
+                                            .toString()
+                                            .split('T')[0],
                                         "appointment_time": selectedTime,
                                         "status": "requested",
-                                        "type": null,
+                                        "type": "كشف",
+                                        "paid": false,
                                         "online": true
                                       };
+                                      // await initiatePaymobPayment(data);
                                       print('booking data: ${data}');
                                       bookingResponse =
                                           await BookingServices.bookADoctor(
@@ -281,7 +358,8 @@ class _DoctorAvailabilityScreenState extends State<DoctorAvailabilityScreen> {
                               ],
                             ),
                             bookingResponse != null
-                                ? Text(bookingResponse.toString())
+                                ? Text(bookingResponse!['message'].toString(),
+                                    style: TextStyle(color: clr(0)))
                                 : Container(),
                           ],
                         ),
@@ -292,8 +370,18 @@ class _DoctorAvailabilityScreenState extends State<DoctorAvailabilityScreen> {
   }
 
   // Example function for Paymob integration (add your actual logic here)
-  void initiatePaymobPayment() {
-    // TODO: Integrate Paymob API for payment
-    print('Initiating Paymob Payment for $selectedDate at $selectedTime');
+  Future<void> initiatePaymobPayment(Map data) async {
+    final paymentKey = await PaymentServices.payWithPaymob(1);
+    if (paymentKey != null) {
+      print('got payment key');
+      final paymobIframeURL =
+          'https://accept.paymob.com/api/acceptance/iframes/872857?payment_token=$paymentKey';
+      Navigator.pushNamed(context, 'paymentGateway',
+          arguments: {"url": paymobIframeURL, "data": data});
+      // print(paymobIframeURL);
+      // Navigator.of(context).push(MaterialPageRoute(
+      //   builder: (_) => PaymentWebView(paymentUrl: paymobIframeURL),
+      // ));
+    }
   }
 }

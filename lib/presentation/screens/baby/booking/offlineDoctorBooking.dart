@@ -30,35 +30,35 @@ class _OfflineDoctorBookingState extends State<OfflineDoctorBooking> {
             } else if (snapshot.hasData) {
               final doctors = snapshot.data!;
               return ListView.builder(
-          itemCount: doctors.length,
-          itemBuilder: (context, index) {
-            if (index == 0) {
-              return Column(
-                children: [
-                  SizedBox(),
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    child: mainTextField(
-                        searchController, "بحث عن دكتور", Icon(Icons.search)),
-                  ),
-                  DoctorCard(
-                    doctor: doctors[index],
-                    onPressed: () {
-                      // Navigate to the doctor's detail screen
-                    },
-                  ),
-                ],
-              );
-            } else {
-              return DoctorCard(
-                doctor: doctors[index],
-                onPressed: () {
-                  // Navigate to the doctor's detail screen
+                itemCount: doctors.length,
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    return Column(
+                      children: [
+                        SizedBox(),
+                        Container(
+                          padding: EdgeInsets.all(10),
+                          child: mainTextField(searchController, "بحث عن دكتور",
+                              Icon(Icons.search)),
+                        ),
+                        DoctorCard(
+                          doctor: doctors[index],
+                          onPressed: () {
+                            // Navigate to the doctor's detail screen
+                          },
+                        ),
+                      ],
+                    );
+                  } else {
+                    return DoctorCard(
+                      doctor: doctors[index],
+                      onPressed: () {
+                        // Navigate to the doctor's detail screen
+                      },
+                    );
+                  }
                 },
               );
-            }
-          },
-        );
             } else {
               return Text("unknown error");
             }
@@ -89,37 +89,43 @@ class DoctorCard extends StatelessWidget {
                   children: [
                     // Display the doctor's name
                     Text(
-                      doctor["name"] != null ? doctor['name'] : "محمد محمد",
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      doctor['name'],
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: clr(0)),
                     ),
                     // Display the doctor's experience
-                    Text("الخبرة: ${doctor["experience"]}"),
+                    Text("الخبرة: ${doctor["experience"] ?? "0"}",
+                        style: TextStyle(color: clr(0))),
                     SizedBox(height: 10),
                     // Button to open the detailed screen
-                    
                   ],
                 ),
                 Column(
                   children: [
                     Text(
                       doctor['city'],
-                      style: TextStyle(fontSize: 18),
+                      style: TextStyle(fontSize: 16, color: clr(0)),
                     ),
                     Text(
                       doctor['address'],
-                      style: TextStyle(fontSize: 18),
+                      style: TextStyle(fontSize: 16, color: clr(0)),
                     ),
                   ],
                 ),
-                
               ],
             ),
-            Row(children: [
-              Expanded(child: mainElevatedButton("تفاصيل", () {
-                  Navigator.pushNamed(context, "doctorBookingDetails",
-                      arguments: doctor);
-                }),)
-            ],)
+            Row(
+              children: [
+                Expanded(
+                  child: mainElevatedButton("تفاصيل", () {
+                    Navigator.pushNamed(context, "doctorBookingDetails",
+                        arguments: doctor);
+                  }),
+                )
+              ],
+            )
           ],
         ),
       ),
