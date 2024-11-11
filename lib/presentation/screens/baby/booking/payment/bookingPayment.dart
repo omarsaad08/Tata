@@ -32,18 +32,22 @@ class _BookingPaymentState extends State<BookingPayment> {
             return ListView.builder(
                 itemCount: BookingPaymentServices.paymentMethod!.data!.length,
                 itemBuilder: (context, index) {
-                  return ListTile(
-                    onTap: () {
-                      BookingPaymentServices.processPaymentMethod(
-                          index, context);
-                    },
-                    title: Text(BookingPaymentServices
-                        .paymentMethod!.data![index].nameEn!),
-                    subtitle: Text(BookingPaymentServices
-                        .paymentMethod!.data![index].nameAr!),
-                    leading: Image.network(BookingPaymentServices
-                        .paymentMethod!.data![index].logo!),
-                  );
+                  if (index == 1) {
+                    return ListTile(
+                      onTap: () {
+                        BookingPaymentServices.processPaymentMethod(
+                            index, context);
+                      },
+                      title: Text(BookingPaymentServices
+                          .paymentMethod!.data![index].nameEn!),
+                      subtitle: Text(BookingPaymentServices
+                          .paymentMethod!.data![index].nameAr!),
+                      leading: Image.network(BookingPaymentServices
+                          .paymentMethod!.data![index].logo!),
+                    );
+                  } else {
+                    return Container();
+                  }
                 });
           }
         },

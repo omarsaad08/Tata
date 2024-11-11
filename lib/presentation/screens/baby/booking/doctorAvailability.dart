@@ -347,11 +347,13 @@ class _DoctorAvailabilityScreenState extends State<DoctorAvailabilityScreen> {
                                         "online": true
                                       };
                                       // await initiatePaymobPayment(data);
+                                      Navigator.pushNamed(
+                                          context, 'bookingPayment');
                                       print('booking data: ${data}');
-                                      bookingResponse =
-                                          await BookingServices.bookADoctor(
-                                              data);
-                                      setState(() {});
+                                      // bookingResponse =
+                                      //     await BookingServices.bookADoctor(
+                                      //         data);
+                                      // setState(() {});
                                     },
                                   ),
                                 ),

@@ -51,8 +51,8 @@ class MainApp extends StatelessWidget {
             // onPrimary: clr(5),
             // onSurface: clr(1),
           )),
-      // initialRoute: route,
-      initialRoute: "bookingPayment",
+      initialRoute: route,
+      // initialRoute: "bookingPayment",
       onGenerateRoute: appRouter.generateRoute,
       // for making the app RTL
       localizationsDelegates: [

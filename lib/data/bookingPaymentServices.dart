@@ -30,7 +30,7 @@ class BookingPaymentServices {
       int index, BuildContext context) async {
     try {
       final requestData = {
-        'payment_method_id': 2,
+        'payment_method_id': paymentMethod!.data![index].paymentId!,
         'cartTotal': '100',
         'currency': 'EGP',
         'customer': {
