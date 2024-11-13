@@ -28,10 +28,11 @@ import 'package:tata/presentation/screens/doctor/doctorHome.dart';
 import 'package:tata/presentation/screens/doctor/doctorPreviousBookings.dart';
 import 'package:tata/presentation/screens/doctor/doctorSettings.dart';
 import 'package:tata/presentation/screens/doctor/doctorUpcomingBookings.dart';
+import 'package:tata/presentation/screens/doctor/nextAppointmentDoctor.dart';
 import 'package:tata/presentation/screens/doctor/notifications.dart';
 import 'package:tata/presentation/screens/doctor/offlineBook.dart';
-import 'package:tata/presentation/screens/doctor/onlineBook.dart';
-import 'package:tata/presentation/screens/doctor/videoCall.dart';
+import 'package:tata/presentation/screens/video/video_call_home.dart';
+import 'package:tata/presentation/screens/video/video_call_page.dart';
 
 class AppRouter {
   Route? generateRoute(RouteSettings settings) {
@@ -86,10 +87,6 @@ class AppRouter {
             builder: (context) => OfflineBook(
                   bookData: bookData,
                 ));
-      case 'onlineBook':
-        final Map bookData = settings.arguments as Map;
-        return MaterialPageRoute(
-            builder: (context) => OnlineBook(bookData: bookData));
       case 'doctorAvailability':
         final int doctorId = settings.arguments as int;
         return MaterialPageRoute(
@@ -98,6 +95,10 @@ class AppRouter {
         final data = settings.arguments as Map;
         return MaterialPageRoute(
             builder: (context) => NextAppointment(appointment: data));
+      case 'nextAppointmentDoctor':
+        final data = settings.arguments as Map;
+        return MaterialPageRoute(
+            builder: (context) => NextAppointmentDoctor(appointment: data));
       case 'inputAvailability':
         return MaterialPageRoute(
             builder: (context) => DoctorAvailabilityInputScreen());

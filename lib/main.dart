@@ -52,7 +52,7 @@ class MainApp extends StatelessWidget {
             // onSurface: clr(1),
           )),
       initialRoute: route,
-      // initialRoute: "bookingPayment",
+      // initialRoute: "videoCallPage",
       onGenerateRoute: appRouter.generateRoute,
       // for making the app RTL
       localizationsDelegates: [

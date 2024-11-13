@@ -346,6 +346,7 @@ class _DoctorAvailabilityScreenState extends State<DoctorAvailabilityScreen> {
                                         "paid": false,
                                         "online": true
                                       };
+                                      BookingServices.bookingData = data;
                                       // await initiatePaymobPayment(data);
                                       Navigator.pushNamed(
                                           context, 'bookingPayment');

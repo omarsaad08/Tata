@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
@@ -7,7 +9,15 @@ import 'package:tata/data/storage.dart';
 final dio = Dio();
 final baseUrl = "http://192.168.1.219:3000";
 
+String generateRandomString(int len) {
+  var r = Random();
+  const _chars =
+      'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+  return List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
+}
+
 class BookingServices {
+  static Map<String, dynamic>? bookingData;
   // testing
   static Future<Map<String, dynamic>> fetchDoctorAvailability(
       int doctorId) async {
@@ -36,6 +46,29 @@ class BookingServices {
     final id = await Storage.get('id');
     try {
       Response response = await dio.get('$baseUrl/appointments/next/$id');
+      if (response.statusCode != 200) {
+        throw Exception('failed: ');
+      }
+      // print('${response.data}');
+      Response doctorResponse =
+          await dio.get('$baseUrl/doctor/${response.data['doctor_id']}');
+      if (doctorResponse.statusCode != 200) {
+        throw Exception('failed: ');
+      }
+      final data = Map.from(response.data);
+      data.addAll(doctorResponse.data);
+      // print('data: $data');
+      return data;
+    } catch (e) {
+      throw Exception('error getting next appointment: ${e}');
+    }
+  }
+
+  static Future<Map?> getNextAppointmentForDoctor() async {
+    final id = await Storage.get('id');
+    try {
+      Response response =
+          await dio.get('$baseUrl/appointments/next/doctor/$id');
       if (response.statusCode != 200) {
         throw Exception('failed: ');
       }
@@ -110,11 +143,12 @@ class BookingServices {
   }
 
   // -------
-  static Future<Map> bookADoctor(Map data) async {
+  static Future<Map> bookADoctor(Map<String, dynamic> data) async {
     try {
+      data.addAll({"roomid": generateRandomString(20)});
+
       Response response = await dio.post('$baseUrl/appointments', data: data);
       if (response.statusCode != 200) throw Exception(response.data);
-      // print('data: ${response.data}');
       return response.data;
     } catch (e) {
       throw Exception("error bookinga  doctor's appointment: $e");

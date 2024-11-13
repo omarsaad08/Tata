@@ -1,6 +1,10 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:tata/logic/video_utils.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
+import 'package:tata/presentation/screens/video/video_call_page.dart';
 
 class NextAppointment extends StatefulWidget {
   final Map appointment;
@@ -13,6 +17,7 @@ class NextAppointment extends StatefulWidget {
 class NextAppointmentState extends State<NextAppointment> {
   @override
   Widget build(BuildContext context) {
+    print('appointment_data: ${widget.appointment}');
     return Scaffold(
         appBar: AppBar(
             title: Text("الحجز القادم", style: TextStyle(color: clr(0))),
@@ -67,11 +72,38 @@ class NextAppointmentState extends State<NextAppointment> {
                   children: [
                     Expanded(
                       child: mainElevatedButton("الاتصال", () async {
-                        Navigator.pushNamed(context, "videoCall", arguments: {
-                          "channelName":
-                              "appointment_${widget.appointment['appointment_id']}",
-                          "uid": widget.appointment['baby_id']
-                        });
+                        bool isPermissionGranted =
+                            await handlePermissionsForCall(context);
+
+                        if (isPermissionGranted) {
+                          final dio = Dio();
+                          final response = await dio.get(
+                              'http://192.168.1.219:3000/appointments/token',
+                              data: {
+                                "uid": widget.appointment['baby_id'],
+                                "channelName": widget.appointment['roomid']
+                              });
+                          final token = response.data['token'];
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => VideoCallScreen(
+                                  channelName: widget.appointment['roomid'],
+                                  uid: widget.appointment['baby_id'],
+                                  token: token),
+                            ),
+                          );
+                        } else {
+                          print('mic premission failed');
+
+                          Get.snackbar(
+                            "Failed",
+                            "Microphone Permission Required for Video Call.",
+                            backgroundColor: Colors.white,
+                            colorText: Color(0xFF1A1E78),
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                        }
                       }, color: clr(1)),
                     ),
                   ],

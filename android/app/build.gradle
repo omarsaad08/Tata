@@ -38,7 +38,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace = "com.example.tata"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 34
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -55,7 +55,9 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
-        minSdkVersion 24
+        minSdkVersion 26
+        targetSdkVersion 31
+        multiDexEnabled true
     }
 
     buildTypes {

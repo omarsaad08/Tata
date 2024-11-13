@@ -88,7 +88,7 @@ class _DoctorHomeState extends State<DoctorHome> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   FutureBuilder(
-                    future: BookingServices.getNextAppointmentForBaby(),
+                    future: BookingServices.getNextAppointmentForDoctor(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(
@@ -124,7 +124,7 @@ class _DoctorHomeState extends State<DoctorHome> {
                                 ),
                                 onTap: () {
                                   Navigator.pushNamed(
-                                      context, "nextAppointment",
+                                      context, "nextAppointmentDoctor",
                                       arguments: snapshot.data);
                                 },
                               ),
