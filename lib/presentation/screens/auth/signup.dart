@@ -35,8 +35,18 @@ class _SignupState extends State<Signup> {
                   borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(25),
                       bottomRight: Radius.circular(25))),
-              child: Text("إنشاء حساب",
-                  style: TextStyle(color: clr(0), fontSize: 32)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("إبدأ أول تاتا",
+                      style: TextStyle(color: clr(0), fontSize: 32)),
+                  SizedBox(
+                    height: 12,
+                  ),
+                  Text("إنشاء حساب",
+                      style: TextStyle(color: clr(0), fontSize: 24))
+                ],
+              ),
             ),
             SizedBox(
               height: 12,

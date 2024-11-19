@@ -104,12 +104,12 @@ class BookingServices {
     }
   }
 
-  static Future<void> updateAppointment(int appointment_id, Map data) async {
+  static Future<int?> updateAppointment(int appointment_id, Map data) async {
     try {
       Response response =
           await dio.patch('$baseUrl/appointments/$appointment_id', data: data);
       if (response.statusCode == 200) {
-        return response.data;
+        return 1;
       }
       throw Exception('failed to update appointment: ${response.data}');
     } catch (e) {

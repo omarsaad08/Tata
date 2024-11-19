@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tata/data/storage.dart';
+import 'package:tata/data/user.dart';
 import 'package:tata/firebase_options.dart';
 import 'package:tata/presentation/components/theme.dart';
 import 'package:tata/appRouter.dart';
@@ -19,6 +18,8 @@ void main() async {
   // routing
   if (user != null) {
     final data = await Storage.getIdAndType();
+    TataUser.id = int.parse(data['id']);
+    TataUser.type = data['type'];
     print('user: ${data}');
     if (data['type'] == 'baby') {
       route = 'babyHome';
@@ -45,12 +46,12 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-          fontFamily: "NotoSansArabic",
+          // fontFamily: "NotoSansArabic",
           colorScheme: ColorScheme.light(
-            primary: clr(1),
-            // onPrimary: clr(5),
-            // onSurface: clr(1),
-          )),
+        primary: clr(1),
+        // onPrimary: clr(5),
+        // onSurface: clr(1),
+      )),
       initialRoute: route,
       // initialRoute: "videoCallPage",
       onGenerateRoute: appRouter.generateRoute,

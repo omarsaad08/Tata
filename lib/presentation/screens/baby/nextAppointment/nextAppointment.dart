@@ -108,16 +108,16 @@ class NextAppointmentState extends State<NextAppointment> {
                     ),
                   ],
                 ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: mainElevatedButton("انهاء", () {
-                        Navigator.pushNamed(context, 'finishAppointment',
-                            arguments: widget.appointment);
-                      }, color: clr(5)),
-                    ),
-                  ],
-                ),
+                // Row(
+                //   children: [
+                //     Expanded(
+                //       child: mainElevatedButton("انهاء", () {
+                //         Navigator.pushNamed(context, 'finishAppointment',
+                //             arguments: widget.appointment);
+                //       }, color: clr(5)),
+                //     ),
+                //   ],
+                // ),
                 SizedBox(
                   width: 8,
                 ),

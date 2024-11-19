@@ -32,30 +32,34 @@ class _OfflineDoctorBookingState extends State<OfflineDoctorBooking> {
               return ListView.builder(
                 itemCount: doctors.length,
                 itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return Column(
-                      children: [
-                        SizedBox(),
-                        Container(
-                          padding: EdgeInsets.all(10),
-                          child: mainTextField(searchController, "بحث عن دكتور",
-                              Icon(Icons.search)),
-                        ),
-                        DoctorCard(
-                          doctor: doctors[index],
-                          onPressed: () {
-                            // Navigate to the doctor's detail screen
-                          },
-                        ),
-                      ],
-                    );
+                  if (doctors.length != 0) {
+                    if (index == 0) {
+                      return Column(
+                        children: [
+                          SizedBox(),
+                          Container(
+                            padding: EdgeInsets.all(10),
+                            child: mainTextField(searchController,
+                                "بحث عن دكتور", Icon(Icons.search)),
+                          ),
+                          DoctorCard(
+                            doctor: doctors[index],
+                            onPressed: () {
+                              // Navigate to the doctor's detail screen
+                            },
+                          ),
+                        ],
+                      );
+                    } else {
+                      return DoctorCard(
+                        doctor: doctors[index],
+                        onPressed: () {
+                          // Navigate to the doctor's detail screen
+                        },
+                      );
+                    }
                   } else {
-                    return DoctorCard(
-                      doctor: doctors[index],
-                      onPressed: () {
-                        // Navigate to the doctor's detail screen
-                      },
-                    );
+                    return Center(child: Text("لا يوجد دكتور متوفر حاليا"));
                   }
                 },
               );

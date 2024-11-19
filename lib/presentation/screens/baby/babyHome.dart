@@ -6,7 +6,7 @@ import 'package:tata/presentation/components/theme.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:tata/presentation/screens/baby/follow_up/periodicFolowUpHistory.dart';
 import 'package:tata/presentation/screens/baby/previousBookingsDetails/previousBookings.dart';
-import 'package:tata/presentation/screens/baby/profile/Profile.dart';
+import 'package:tata/presentation/screens/baby/settings/settings.dart';
 import 'package:tata/presentation/screens/baby/tata/tataHome.dart';
 
 class BabyHome extends StatefulWidget {
@@ -17,7 +17,7 @@ class BabyHome extends StatefulWidget {
 }
 
 class _BabyHomeState extends State<BabyHome> {
-  int _selectedIndex = 2;
+  int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -26,11 +26,10 @@ class _BabyHomeState extends State<BabyHome> {
   }
 
   final List<Widget> _screens = [
+    Home(),
     PeriodicFollowUpHistory(),
     PreviousBookings(),
-    Home(),
-    TataHome(),
-    Profile(),
+    BabySettings(),
   ];
   @override
   Widget build(BuildContext context) {
@@ -52,14 +51,6 @@ class _BabyHomeState extends State<BabyHome> {
         currentIndex: _selectedIndex,
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Iconsax.calendar_tick5),
-            label: 'المتابعة الدورية',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Iconsax.hospital5),
-            label: 'الحجوزات',
-          ),
-          BottomNavigationBarItem(
             icon: Container(
               padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
@@ -71,11 +62,12 @@ class _BabyHomeState extends State<BabyHome> {
             label: 'الرئيسية',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/launcher_icon.png',
-              width: 40,
-            ),
-            label: 'تاتا',
+            icon: Icon(Iconsax.calendar_tick5),
+            label: 'المتابعة الدورية',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Iconsax.hospital5),
+            label: 'الحجوزات',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),

@@ -110,7 +110,10 @@ class NextAppointmentDoctorState extends State<NextAppointmentDoctor> {
                 Row(
                   children: [
                     Expanded(
-                      child: mainElevatedButton("انهاء", () {}, color: clr(5)),
+                      child: mainElevatedButton("انهاء", () {
+                        Navigator.pushNamed(context, 'finishAppointment',
+                            arguments: widget.appointment);
+                      }, color: clr(5)),
                     ),
                   ],
                 ),

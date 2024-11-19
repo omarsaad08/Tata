@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:tata/data/storage.dart';
 
 final dio = Dio();
 final baseUrl = "http://192.168.1.219:3000";
@@ -30,9 +31,10 @@ class PeriodicFollowUpServices {
     }
   }
 
-  static Future<Map> getHistoryOfPeriodicFollowUpForABaby() async {
+  static Future<List?> getAllFollowUps() async {
     try {
-      Response response = await dio.get('$baseUrl/baby/periodicFollowUp');
+      final id = await Storage.get('id');
+      Response response = await dio.get('$baseUrl/follow_up/$id');
       if (response.statusCode != 200) {
         throw Exception(response.data);
       }

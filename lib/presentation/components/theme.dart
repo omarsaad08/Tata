@@ -11,7 +11,7 @@ Color clr(int colorNum) {
     case 3:
       return Color(0xffD9D9D9);
     case 4:
-      return Color(0xffe6b5fb);
+      return Color(0xffeeeeee);
     case 5:
       return Color(0xffed87ab);
     case 6:

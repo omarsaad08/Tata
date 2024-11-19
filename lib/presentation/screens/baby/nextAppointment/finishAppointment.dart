@@ -13,6 +13,7 @@ class FinishAppointment extends StatefulWidget {
 
 class _FinishAppointmentState extends State<FinishAppointment> {
   TextEditingController reportController = TextEditingController();
+  String? message;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,10 +35,15 @@ class _FinishAppointmentState extends State<FinishAppointment> {
               Row(
                 children: [
                   Expanded(
-                    child: mainElevatedButton("حفظ", () {
-                      BookingServices.updateAppointment(
+                    child: mainElevatedButton("حفظ", () async {
+                      final result = await BookingServices.updateAppointment(
                           widget.appointment['appointment_id'],
-                          {'record': reportController});
+                          {'record': reportController.text, 'status': "منتهي"});
+                      if (result != 1) {
+                        message = 'عذرا يوجد خطأ';
+                      } else {
+                        Navigator.pushReplacementNamed(context, 'doctorHome');
+                      }
                     }),
                   ),
                 ],

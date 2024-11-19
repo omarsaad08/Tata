@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tata/data/storage.dart';
 import 'package:tata/presentation/screens/auth/login.dart';
 import 'package:tata/presentation/screens/auth/signup.dart';
+import 'package:tata/presentation/screens/auth/uploadImage.dart';
 import 'package:tata/presentation/screens/auth/userSetup.dart';
 import 'package:tata/presentation/screens/baby/babyHome.dart';
 import "package:tata/presentation/screens/auth/babySetup.dart";
@@ -22,17 +22,16 @@ import 'package:tata/presentation/screens/baby/booking/payment.dart';
 import 'package:tata/presentation/screens/baby/follow_up/periodicFollowUp.dart';
 import 'package:tata/presentation/screens/baby/previousBookingsDetails/previousBookings.dart';
 import 'package:tata/presentation/screens/baby/previousBookingsDetails/previousBookingsDetails.dart';
+import 'package:tata/presentation/screens/baby/settings/account/accountHome.dart';
 // import 'package:tata/presentation/screens/baby/videoCallPage.dart';
 import 'package:tata/presentation/screens/doctor/doctorAvailabilityInputScreen.dart';
 import 'package:tata/presentation/screens/doctor/doctorHome.dart';
 import 'package:tata/presentation/screens/doctor/doctorPreviousBookings.dart';
-import 'package:tata/presentation/screens/doctor/doctorSettings.dart';
 import 'package:tata/presentation/screens/doctor/doctorUpcomingBookings.dart';
 import 'package:tata/presentation/screens/doctor/nextAppointmentDoctor.dart';
 import 'package:tata/presentation/screens/doctor/notifications.dart';
 import 'package:tata/presentation/screens/doctor/offlineBook.dart';
-import 'package:tata/presentation/screens/video/video_call_home.dart';
-import 'package:tata/presentation/screens/video/video_call_page.dart';
+import 'package:tata/presentation/screens/doctor/settings/settings.dart';
 
 class AppRouter {
   Route? generateRoute(RouteSettings settings) {
@@ -103,7 +102,11 @@ class AppRouter {
         return MaterialPageRoute(
             builder: (context) => DoctorAvailabilityInputScreen());
       case 'doctorSettings':
-        return MaterialPageRoute(builder: (context) => DoctorSettings());
+        final id = settings.arguments as int;
+        return MaterialPageRoute(
+            builder: (context) => DoctorSettings(
+                  doctorId: id,
+                ));
       case 'doctorTimeBooking':
         final doctorId = settings.arguments as int;
         return MaterialPageRoute(
@@ -139,6 +142,10 @@ class AppRouter {
         final result = settings.arguments as bool;
         return MaterialPageRoute(
             builder: (context) => PaymentResult(result: result));
+      case 'accountHome':
+        return MaterialPageRoute(builder: (context) => AccountHome());
+      case 'uploadImage':
+        return MaterialPageRoute(builder: (context) => UploadImageScreen());
     }
   }
 }

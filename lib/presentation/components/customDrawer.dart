@@ -32,7 +32,7 @@ class CustomDrawer extends StatelessWidget {
             leading: Icon(Icons.settings),
             title: Text('الاعدادات'),
             onTap: () async {
-              Navigator.pushNamed(context, "${type}Settings");
+              Navigator.pushNamed(context, "doctorSettings");
             },
           ),
           ListTile(

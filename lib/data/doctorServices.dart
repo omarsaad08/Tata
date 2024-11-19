@@ -16,6 +16,7 @@ class DoctorServices {
       // print('doctors: ${response.data}');
       return response.data;
     } catch (e) {
+      return [];
       throw Exception('error fetching docs: $e');
     }
   }
