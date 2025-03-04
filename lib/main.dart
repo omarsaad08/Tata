@@ -1,37 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:tata/data/storage.dart';
-import 'package:tata/data/user.dart';
-import 'package:tata/firebase_options.dart';
+import 'package:tata/data/auth.dart';
 import 'package:tata/presentation/components/theme.dart';
 import 'package:tata/appRouter.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 late String route;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  User? user = FirebaseAuth.instance.currentUser;
-  // routing
+  await Supabase.initialize(
+      url: "https://dnndzkbrszfuhhtvppuj.supabase.co",
+      anonKey:
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRubmR6a2Jyc3pmdWhodHZwcHVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkwOTQ5NDQsImV4cCI6MjA1NDY3MDk0NH0.divvhyL00ZFImM2GcuOrzl5yp3uuWoOGaYJo0gyoemY");
+  final user = await Auth.getCurrentUser();
   if (user != null) {
-    final data = await Storage.getIdAndType();
-    TataUser.id = int.parse(data['id']);
-    TataUser.type = data['type'];
-    print('user: ${data}');
-    if (data['type'] == 'baby') {
-      route = 'babyHome';
-    } else if (data['type'] == 'doctor') {
-      route = 'doctorHome';
-    } else {
-      route = 'signup';
-    }
+    route = '${user['type']}Home';
   } else {
-    route = 'signup';
+    route = 'login';
   }
-
   runApp(MainApp(
     appRouter: AppRouter(),
   ));
@@ -52,7 +38,7 @@ class MainApp extends StatelessWidget {
         // onPrimary: clr(5),
         // onSurface: clr(1),
       )),
-      initialRoute: route,
+      initialRoute: "login",
       // initialRoute: "videoCallPage",
       onGenerateRoute: appRouter.generateRoute,
       // for making the app RTL

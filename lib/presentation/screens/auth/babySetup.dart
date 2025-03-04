@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tata/data/auth.dart';
-import 'package:tata/data/storage.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class BabySetup extends StatefulWidget {
   BabySetup({super.key});
@@ -78,17 +76,26 @@ class _BabySetupState extends State<BabySetup> {
               mainElevatedButton("تم", () async {
                 message = '';
                 // handle the logic of saving the child's data + check if he is less than 2 years or not
-                final data = {
-                  "name": babyNameController.text,
-                  "date_of_birth":
-                      selectedDate!.toLocal().toString().split(' ')[0],
-                  "email": await Storage.get('email'),
-                  "phone": phoneController.text
-                };
-                final result = await Auth.saveUser(data, 'baby');
-                if (result == 0) {
+
+                try {
+                  final userData = {
+                    "name": babyNameController.text,
+                    "email": await Auth.getCurrentUserEmail(),
+                    "phone": phoneController.text,
+                    "role": "baby"
+                  };
+                  final user = await Auth.saveUser(userData);
+
+                  final babyData = {
+                    "user_id": user!['id'],
+                    "date_of_birth":
+                        selectedDate!.toLocal().toString().split(' ')[0],
+                  };
+
+                  await Auth.saveUser(babyData, type: "baby");
+
                   Navigator.pushReplacementNamed(context, "babyHome");
-                } else {
+                } catch (e) {
                   setState(() {
                     message = 'عذرا حدث خطا';
                   });

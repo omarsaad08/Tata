@@ -28,7 +28,7 @@ class _PaymentWebViewState extends State<PaymentWebView> {
       ),
       body: InAppWebView(
         initialUrlRequest: URLRequest(
-          url: Uri.parse(widget.url), // Replace with your desired URL
+          url: WebUri(widget.url), // Replace with your desired URL
         ),
         onWebViewCreated: (controller) {
           _webViewController = controller;

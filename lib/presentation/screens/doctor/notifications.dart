@@ -4,8 +4,7 @@ import 'package:tata/presentation/components/theme.dart';
 import 'package:tata/data/bookingServices.dart';
 
 class DoctorNotifications extends StatefulWidget {
-  final id;
-  const DoctorNotifications({super.key, required this.id});
+  const DoctorNotifications({super.key});
 
   @override
   State<DoctorNotifications> createState() => _DoctorNotificationsState();
@@ -20,7 +19,7 @@ class _DoctorNotificationsState extends State<DoctorNotifications> {
             centerTitle: true,
             backgroundColor: clr(1)),
         body: FutureBuilder(
-          future: BookingServices.getRequestedAppointments(widget.id),
+          future: BookingServices.getRequestedAppointments(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());

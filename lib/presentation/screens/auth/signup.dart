@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tata/data/auth.dart';
-import 'package:tata/data/storage.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
 
@@ -18,18 +18,19 @@ class _SignupState extends State<Signup> {
   TextEditingController passwordController = TextEditingController();
   bool isPasswordVisible = false;
   String? errorMessage = null;
+  bool loading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 0),
         child: ListView(
-          // mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
               width: double.infinity,
               padding:
-                  EdgeInsets.only(top: 64, bottom: 32, left: 16, right: 16),
+                  EdgeInsets.only(top: 32, bottom: 32, left: 16, right: 16),
               decoration: BoxDecoration(
                   color: clr(1),
                   borderRadius: BorderRadius.only(
@@ -40,11 +41,8 @@ class _SignupState extends State<Signup> {
                 children: [
                   Text("إبدأ أول تاتا",
                       style: TextStyle(color: clr(0), fontSize: 32)),
-                  SizedBox(
-                    height: 12,
-                  ),
                   Text("إنشاء حساب",
-                      style: TextStyle(color: clr(0), fontSize: 24))
+                      style: TextStyle(color: clr(0), fontSize: 20))
                 ],
               ),
             ),
@@ -54,14 +52,8 @@ class _SignupState extends State<Signup> {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 12),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset(
-                    'assets/login.png',
-                    width: 160,
-                  ),
-                  SizedBox(
-                    height: 12,
-                  ),
                   TextField(
                     onChanged: (value) {
                       setState(() {
@@ -117,51 +109,39 @@ class _SignupState extends State<Signup> {
                     children: [
                       Expanded(
                         child: mainElevatedButton(
-                          "تسجيل الدخول",
+                          "إنشاء حساب",
                           () async {
-                            final user = await Auth.signupWithEmail(
-                                emailController.text, passwordController.text);
-                            if (user == 0) {
-                              await Storage.save('email', emailController.text);
-                              Navigator.pushReplacementNamed(
-                                  context, "userSetup");
-                            } else if (user == 1) {
+                            setState(() {
+                              loading = true;
+                            });
+                            try {
+                              final authResponse = await Auth.signUp(
+                                  emailController.text,
+                                  passwordController.text);
+                              if (authResponse.runtimeType == AuthException) {
+                                setState(() {
+                                  errorMessage = authResponse.toString();
+                                });
+                              }
+                              if (authResponse != null &&
+                                  authResponse.runtimeType != AuthException) {
+                                Navigator.pushReplacementNamed(
+                                    context, "userSetup");
+                              } else {
+                                throw Exception(authResponse);
+                              }
+                            } catch (e) {
                               setState(() {
-                                errorMessage = "كلمة المرور ضعيفة.";
+                                loading = false;
                               });
-                            } else if (user == 2) {
-                              setState(() {
-                                errorMessage =
-                                    "هذا البريد الالكتروني مسجل مسبقا";
-                              });
-                            } else {
-                              setState(() {
-                                errorMessage = "عذرا يوجد خطأ";
-                              });
+                              print(e.toString());
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text("error: $e")));
                             }
                           },
                         ),
                       ),
                     ],
-                  ),
-                  const SizedBox(height: 16),
-                  // Google Sign-In Button
-                  TextButton(
-                    onPressed: () async {
-                      final user = await Auth.signInWithGoogle();
-                      if (user != null) {
-                        await Storage.save('email', user.email!);
-                        Navigator.pushReplacementNamed(context, "userSetup");
-                      } else {
-                        setState(() {
-                          errorMessage = "عذرا يوجد خطأ";
-                        });
-                      }
-                    },
-                    child: Image.asset(
-                      'assets/icons8-google-48.png', // Add your Google logo asset path
-                      // height: 24.0,
-                    ),
                   ),
                   const SizedBox(height: 16),
                   // Sign-up Text
@@ -174,6 +154,8 @@ class _SignupState extends State<Signup> {
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  loading ? CircularProgressIndicator() : Container(),
                 ],
               ),
             )

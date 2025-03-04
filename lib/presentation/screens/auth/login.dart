@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:tata/data/auth.dart';
-import 'package:tata/data/storage.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
 
@@ -27,7 +26,7 @@ class _LoginState extends State<Login> {
             Container(
               width: double.infinity,
               padding:
-                  EdgeInsets.only(top: 64, bottom: 32, left: 16, right: 16),
+                  EdgeInsets.only(top: 32, bottom: 32, left: 16, right: 16),
               decoration: BoxDecoration(
                   color: clr(1),
                   borderRadius: BorderRadius.only(
@@ -38,11 +37,8 @@ class _LoginState extends State<Login> {
                 children: [
                   Text("إبدأ أول تاتا",
                       style: TextStyle(color: clr(0), fontSize: 32)),
-                  SizedBox(
-                    height: 12,
-                  ),
                   Text("تسجيل الدخول",
-                      style: TextStyle(color: clr(0), fontSize: 24))
+                      style: TextStyle(color: clr(0), fontSize: 20))
                 ],
               ),
             ),
@@ -53,13 +49,6 @@ class _LoginState extends State<Login> {
               padding: EdgeInsets.symmetric(horizontal: 12),
               child: Column(
                 children: [
-                  Image.asset(
-                    'assets/login.png',
-                    width: 160,
-                  ),
-                  SizedBox(
-                    height: 12,
-                  ),
                   TextField(
                     onChanged: (value) {
                       setState(() {
@@ -119,61 +108,21 @@ class _LoginState extends State<Login> {
                   ),
                   const SizedBox(height: 8),
                   errorMessage != null ? Text(errorMessage!) : Container(),
-                  Row(
-                    children: [
-                      Row(
-                        children: [
-                          Radio<String>(
-                            value: 'دكتور',
-                            groupValue: _selectedOption,
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedOption = value!;
-                              });
-                            },
-                          ),
-                          const Text('دكتور'),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Radio<String>(
-                            value: "طفل",
-                            groupValue: _selectedOption,
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedOption = value!;
-                              });
-                            },
-                          ),
-                          const Text('طفل'),
-                        ],
-                      ),
-                    ],
-                  ),
                   const SizedBox(height: 24),
                   Row(
                     children: [
                       Expanded(
                         child: mainElevatedButton("تسجيل الدخول", () async {
                           // Handle login logic
-                          final user = await Auth.signinWithEmail(
+                          final user = await Auth.signIn(
                               emailController.text, passwordController.text);
                           if (user != null) {
-                            await Storage.save('email', emailController.text);
                             // get user data
-                            final result = await Auth.getUserWithEmail(
-                                emailController.text,
-                                _selectedOption == "دكتور" ? "doctor" : "baby");
-                            if (result != null) {
-                              await Storage.save('id', result['id'].toString());
-                              await Storage.save(
-                                  'type',
-                                  _selectedOption == "دكتور"
-                                      ? "doctor"
-                                      : "baby");
-                              Navigator.pushReplacementNamed(context,
-                                  "${_selectedOption == "دكتور" ? "doctor" : "baby"}Home");
+                            final userType =
+                                (await Auth.getCurrentUser())!['type'];
+                            if (userType != null) {
+                              Navigator.pushReplacementNamed(
+                                  context, "${userType}Home");
                             }
                           } else {
                             setState(() {
@@ -186,25 +135,7 @@ class _LoginState extends State<Login> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  // Google Sign-In Button
-                  TextButton(
-                    onPressed: () async {
-                      final user = await Auth.signInWithGoogle();
-                      if (user != null) {
-                        await Storage.save('email', user.email!);
-                        Navigator.pushReplacementNamed(context, "userSetup");
-                      } else {
-                        setState(() {
-                          errorMessage = "عذرا يوجد خطأ";
-                        });
-                      }
-                    },
-                    child: Image.asset(
-                      'assets/icons8-google-48.png', // Add your Google logo asset path
-                      // height: 24.0,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
+
                   // Sign-up Text
                   TextButton(
                     onPressed: () {

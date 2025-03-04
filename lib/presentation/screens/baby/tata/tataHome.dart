@@ -17,7 +17,7 @@ class _TataHomeState extends State<TataHome> {
     return Scaffold(
       body: InAppWebView(
         initialUrlRequest: URLRequest(
-          url: Uri.parse(
+          url: WebUri(
               'https://tataegypt.netlify.app/services'), // Replace with your desired URL
         ),
         onWebViewCreated: (controller) {

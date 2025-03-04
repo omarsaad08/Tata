@@ -1,12 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:tata/data/auth.dart';
-import 'package:tata/data/user.dart';
 import 'package:tata/presentation/components/theme.dart';
 
 class DoctorSettings extends StatefulWidget {
-  final int doctorId;
-  const DoctorSettings({super.key, required this.doctorId});
+  const DoctorSettings({super.key});
 
   @override
   State<DoctorSettings> createState() => _DoctorSettingsState();
@@ -17,8 +15,8 @@ class _DoctorSettingsState extends State<DoctorSettings> {
     {"icon": Icon(Icons.person), "name": "الحساب", "route": "accountHome"}
   ];
   Future<String?> getImageUrl() async {
-    final user = await Auth.getUser('${TataUser.id!}', TataUser.type!);
-    return user!['profile_image_path'];
+    // final user = await Auth.getUser('${TataUser.id!}', TataUser.type!);
+    // return user!['profile_image_path'];
   }
 
   @override

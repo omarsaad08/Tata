@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tata/data/auth.dart';
 import 'package:tata/presentation/components/theme.dart';
 
 class BabySettings extends StatefulWidget {
@@ -10,7 +11,17 @@ class BabySettings extends StatefulWidget {
 
 class _BabySettingsState extends State<BabySettings> {
   List screens = [
-    {"icon": Icon(Icons.person), "name": "الحساب", "route": "accountHome"}
+    {
+      "icon": Icon(Icons.person),
+      "name": "الحساب",
+      "route": "accountHome",
+    },
+    {
+      "icon": Icon(Icons.language),
+      "name": "تغيير اللغة",
+      "route": "changeLanguage"
+    },
+    {"icon": Icon(Icons.logout), "name": "تسجيل الخروج", "route": "logout"}
   ];
   @override
   Widget build(BuildContext context) {
@@ -21,8 +32,13 @@ class _BabySettingsState extends State<BabySettings> {
         itemCount: screens.length,
         itemBuilder: (context, index) {
           return InkWell(
-            onTap: () {
-              Navigator.pushNamed(context, screens[index]['route']);
+            onTap: () async {
+              if (screens[index]['route'] != "logout") {
+                Navigator.pushNamed(context, screens[index]['route']);
+              } else {
+                await Auth.signOut();
+                Navigator.pushReplacementNamed(context, "login");
+              }
             },
             child: Container(
                 decoration: BoxDecoration(

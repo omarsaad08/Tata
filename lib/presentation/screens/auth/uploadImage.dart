@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
-import 'package:tata/data/storage.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
 
@@ -44,11 +43,9 @@ class _UploadImageScreenState extends State<UploadImageScreen> {
       FormData formData = FormData.fromMap({
         'image': await MultipartFile.fromFile(_image!.path, filename: fileName),
       });
-      final id = await Storage.get('id');
-      final type = await Storage.get('type');
       // Send a POST request
       Response response = await dio.put(
-        'http://192.168.1.219:3000/$type/image/$id', // Replace with your API URL
+        'http://192.168.1.219:3000/image/', // Replace with your API URL
         data: formData,
       );
 

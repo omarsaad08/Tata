@@ -77,9 +77,8 @@ class AppRouter {
         return MaterialPageRoute(
             builder: (context) => DoctorPreviousBookings());
       case 'doctorNotifications':
-        final id = settings.arguments as int;
         return MaterialPageRoute(
-            builder: (context) => DoctorNotifications(id: id));
+            builder: (context) => DoctorNotifications());
       case 'offlineBook':
         final Map bookData = settings.arguments as Map;
         return MaterialPageRoute(
@@ -102,21 +101,12 @@ class AppRouter {
         return MaterialPageRoute(
             builder: (context) => DoctorAvailabilityInputScreen());
       case 'doctorSettings':
-        final id = settings.arguments as int;
         return MaterialPageRoute(
-            builder: (context) => DoctorSettings(
-                  doctorId: id,
-                ));
+            builder: (context) => DoctorSettings());
       case 'doctorTimeBooking':
         final doctorId = settings.arguments as int;
         return MaterialPageRoute(
             builder: (context) => DoctorTimeBooking(doctorId: doctorId));
-      // case 'videoCall':
-      //   final data = settings.arguments as Map;
-      //   // print('video data: $data');
-      //   return MaterialPageRoute(
-      //       builder: (context) =>
-      //           VideoCall(channelName: data['channelName'], uid: data['uid']));
       case 'paymentGateway':
         final data = settings.arguments as Map;
         return MaterialPageRoute(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tata/data/auth.dart';
 import 'package:tata/data/bookingServices.dart';
-import 'package:tata/data/storage.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
 
@@ -52,7 +52,6 @@ class _DoctorAvailabilityInputScreenState
 
   void saveAvailability() async {
     // Here you would save the availability data to your database
-    String? doctorId = await Storage.get('id');
     final List<Map<String, dynamic>> availabilityList = [];
 
     for (int i = 0; i < daysOfWeek.length; i++) {
@@ -60,7 +59,7 @@ class _DoctorAvailabilityInputScreenState
       int weekday = i + 1; // Monday is 1, Sunday is 7
       if (formatTimeTo24Hour(startTime[i]) != formatTimeTo24Hour(endTime[i])) {
         availabilityList.add({
-          'doctor_id': doctorId,
+          'doctor_id': (await Auth.getCurrentUser(type: "doctor"))!['id'],
           'weekday': weekday,
           'start_time':
               formatTimeTo24Hour(startTime[i]), // Save in 24-hour format

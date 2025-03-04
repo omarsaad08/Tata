@@ -23,7 +23,7 @@ class _PaymentState extends State<Payment> {
 
   void startPayment() {
     _webViewController?.loadUrl(
-        urlRequest: URLRequest(url: Uri.parse(widget.url)));
+        urlRequest: URLRequest(url: WebUri(widget.url)));
   }
 
   @override

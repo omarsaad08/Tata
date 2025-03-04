@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:tata/data/storage.dart';
+import 'package:tata/data/auth.dart';
 import 'package:tata/presentation/components/theme.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -39,8 +39,7 @@ class CustomDrawer extends StatelessWidget {
             leading: Icon(Icons.exit_to_app),
             title: Text('تسجيل الخروج'),
             onTap: () async {
-              await FirebaseAuth.instance.signOut();
-              await Storage.deleteIdAndType();
+              await Auth.signOut();
               Navigator.pushReplacementNamed(context, "login");
             },
           ),

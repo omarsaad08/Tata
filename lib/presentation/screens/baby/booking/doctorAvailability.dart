@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'dart:convert'; // For JSON decoding
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:tata/data/auth.dart';
 import 'package:tata/data/bookingServices.dart';
 import 'package:tata/data/paymentServices.dart';
-import 'package:tata/data/storage.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart'; // For date formatting
 
@@ -332,8 +332,7 @@ class _DoctorAvailabilityScreenState extends State<DoctorAvailabilityScreen> {
                                   child: mainElevatedButton(
                                     "احجز",
                                     () async {
-                                      final baby_id =
-                                          (await Storage.getIdAndType())['id'];
+                                      final baby_id = (await Auth.getCurrentUser(type: 'baby'))!['id'];
                                       final data = {
                                         "baby_id": baby_id,
                                         "doctor_id": widget.doctorId,

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
 
-import 'package:tata/data/storage.dart';
+import 'package:tata/data/auth.dart';
 
 final dio = Dio();
 final baseUrl = "http://192.168.1.219:3000";
@@ -43,45 +43,15 @@ class BookingServices {
   }
 
   static Future<Map?> getNextAppointmentForBaby() async {
-    final id = await Storage.get('id');
     try {
-      Response response = await dio.get('$baseUrl/appointments/next/$id');
-      if (response.statusCode != 200) {
-        throw Exception('failed: ');
-      }
-      // print('${response.data}');
-      Response doctorResponse =
-          await dio.get('$baseUrl/doctor/${response.data['doctor_id']}');
-      if (doctorResponse.statusCode != 200) {
-        throw Exception('failed: ');
-      }
-      final data = Map.from(response.data);
-      data.addAll(doctorResponse.data);
-      // print('data: $data');
-      return data;
+      
     } catch (e) {
       throw Exception('error getting next appointment: ${e}');
     }
   }
 
   static Future<Map?> getNextAppointmentForDoctor() async {
-    final id = await Storage.get('id');
     try {
-      Response response =
-          await dio.get('$baseUrl/appointments/next/doctor/$id');
-      if (response.statusCode != 200) {
-        throw Exception('failed: ');
-      }
-      // print('${response.data}');
-      Response doctorResponse =
-          await dio.get('$baseUrl/doctor/${response.data['doctor_id']}');
-      if (doctorResponse.statusCode != 200) {
-        throw Exception('failed: ');
-      }
-      final data = Map.from(response.data);
-      data.addAll(doctorResponse.data);
-      // print('data: $data');
-      return data;
     } catch (e) {
       throw Exception('error getting next appointment: ${e}');
     }
@@ -117,8 +87,9 @@ class BookingServices {
     }
   }
 
-  static Future<List?> getRequestedAppointments(int id) async {
+  static Future<List?> getRequestedAppointments() async {
     try {
+      final id = (await Auth.getCurrentUser(type: "doctor"))!['id'];
       Response response = await dio.get('$baseUrl/appointments/requested/$id');
       if (response.statusCode == 200) {
         return response.data;
@@ -131,18 +102,12 @@ class BookingServices {
 
   static Future<List?> fetchPreviousBookingsForBaby() async {
     try {
-      final id = await Storage.get('id');
-      Response response = await dio.get('$baseUrl/appointments/previous/$id');
-      if (response.statusCode == 200) {
-        return response.data;
-      }
-      throw Exception('failed to get previous booking: ${response.data}');
+
     } catch (e) {
       rethrow;
     }
   }
 
-  // -------
   static Future<Map> bookADoctor(Map<String, dynamic> data) async {
     try {
       data.addAll({"roomid": generateRandomString(20)});

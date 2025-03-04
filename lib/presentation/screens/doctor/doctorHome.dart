@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:tata/data/bookingServices.dart';
-import 'package:tata/data/storage.dart';
-import 'package:tata/data/user.dart';
 import 'package:tata/presentation/components/customDrawer.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
@@ -28,7 +26,6 @@ class _DoctorHomeState extends State<DoctorHome> {
   final List<Widget> _screens = [
     Home(),
     DoctorSettings(
-      doctorId: TataUser.id!,
     ),
   ];
   @override
@@ -40,9 +37,7 @@ class _DoctorHomeState extends State<DoctorHome> {
           padding: EdgeInsets.all(20),
         ),
         onPressed: () async {
-          final id = await Storage.get('id');
-          Navigator.pushNamed(context, "doctorNotifications",
-              arguments: int.parse(id!));
+          Navigator.pushNamed(context, "doctorNotifications");
         },
         label: Icon(
           Icons.notifications,
@@ -108,9 +103,9 @@ class _HomeState extends State<Home> {
   Future<void> fetchBookings() async {
     try {
       final dio = Dio();
-      final doctorId = int.parse((await Storage.get('id'))!);
+      // final doctorId = int.parse((await Storage.get('id'))!);
       final response = await dio
-          .get('http://192.168.1.219:3000/appointments/today/$doctorId');
+          .get('http://192.168.1.219:3000/appointments/today/');
 
       if (response.statusCode == 200) {
         setState(() {

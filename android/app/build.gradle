@@ -38,7 +38,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace = "com.example.tata"
-    compileSdk = 34
+    compileSdk = 35
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

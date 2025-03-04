@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:tata/data/auth.dart';
-import 'package:tata/data/storage.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/mainTextField.dart';
 import 'package:tata/presentation/components/theme.dart';
@@ -107,7 +106,7 @@ class _DoctorSetupState extends State<DoctorSetup> {
                 child: mainElevatedButton("تم", () async {
                   final data = {
                     'name': nameController.text,
-                    'email': await Storage.get('email'),
+                    'email': await Auth.getCurrentUserEmail(),
                     'phone': phoneNumberController.text,
                     'city': cityController.text,
                     'address': addressController.text,
@@ -117,7 +116,7 @@ class _DoctorSetupState extends State<DoctorSetup> {
                     'sessionPrice': sessionPriceController.text,
                     'experience': experience
                   };
-                  final result = await Auth.saveUser(data, 'doctor');
+                  final result = await Auth.saveUser(data, type: 'doctor');
                   if (result == 0) {
                     Navigator.pushReplacementNamed(
                         context, "inputAvailability");

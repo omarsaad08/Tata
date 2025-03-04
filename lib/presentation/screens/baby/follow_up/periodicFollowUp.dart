@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:tata/data/auth.dart';
 import 'package:tata/data/periodicFollowUpServices.dart';
-import 'package:tata/data/storage.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/mainTextField.dart';
 import 'package:tata/presentation/components/theme.dart';
@@ -205,13 +204,9 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
               try {
                 // send the data to the server to analyze it
                 final values = followUp.generateValues();
-                final basicData = await Storage.getIdAndType();
                 print('going to get the user from the server');
-                final user =
-                    await Auth.getUser(basicData['id'], basicData['type']);
-                print('got the user');
                 final data = {
-                  "baby_id": (await Storage.getIdAndType())['id'],
+                  "baby_id": (await Auth.getCurrentUser(type: 'baby'))!['id'],
                   "follow_up_date":
                       DateTime.now().toLocal().toString().split(' ')[0],
                   "motorMilestones": values[0],
