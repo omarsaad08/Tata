@@ -15,7 +15,22 @@ class _LoginState extends State<Login> {
   TextEditingController passwordController = TextEditingController();
   bool isPasswordVisible = false;
   String? errorMessage = null;
-  String _selectedOption = "طفل";
+
+  Future login() async {
+    final user =
+        await Auth.signIn(emailController.text, passwordController.text);
+    if (user != null) {
+      final userType = (await Auth.getCurrentUser())!['type'];
+      if (userType != null) {
+        Navigator.pushReplacementNamed(context, "${userType}Home");
+      }
+    } else {
+      setState(() {
+        errorMessage = "البريد الالكتروني او كلمة المرور خطأ";
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,25 +127,7 @@ class _LoginState extends State<Login> {
                   Row(
                     children: [
                       Expanded(
-                        child: mainElevatedButton("تسجيل الدخول", () async {
-                          // Handle login logic
-                          final user = await Auth.signIn(
-                              emailController.text, passwordController.text);
-                          if (user != null) {
-                            // get user data
-                            final userType =
-                                (await Auth.getCurrentUser())!['type'];
-                            if (userType != null) {
-                              Navigator.pushReplacementNamed(
-                                  context, "${userType}Home");
-                            }
-                          } else {
-                            setState(() {
-                              errorMessage =
-                                  "البريد الالكتروني او كلمة المرور خطأ";
-                            });
-                          }
-                        }),
+                        child: mainElevatedButton("تسجيل الدخول", login),
                       ),
                     ],
                   ),

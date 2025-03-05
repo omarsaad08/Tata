@@ -25,8 +25,7 @@ class _DoctorHomeState extends State<DoctorHome> {
 
   final List<Widget> _screens = [
     Home(),
-    DoctorSettings(
-    ),
+    DoctorSettings(),
   ];
   @override
   Widget build(BuildContext context) {
@@ -104,8 +103,8 @@ class _HomeState extends State<Home> {
     try {
       final dio = Dio();
       // final doctorId = int.parse((await Storage.get('id'))!);
-      final response = await dio
-          .get('http://192.168.1.219:3000/appointments/today/');
+      final response =
+          await dio.get('http://192.168.1.219:3000/appointments/today/');
 
       if (response.statusCode == 200) {
         setState(() {
@@ -131,23 +130,21 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return isLoading
-        ? Center(child: CircularProgressIndicator()) // Show loading spinner
+        ? Center(child: CircularProgressIndicator())
         : Container(
             padding: EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 FutureBuilder(
-                  future: BookingServices.getNextAppointmentForDoctor(),
+                  future: BookingServices.getNextAppointment("doctor"),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(
                           child: CircularProgressIndicator(color: clr(1)));
                     } else if (snapshot.hasError) {
-                      // return Center(child: Text('Error: ${snapshot.error}'));
                       return Container();
                     } else if (snapshot.hasData) {
-                      // Make sure to return the Row widget here
                       return Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [

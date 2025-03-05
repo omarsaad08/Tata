@@ -94,7 +94,7 @@ class _HomeState extends State<Home> {
       color: clr(0),
       child: ListView(children: [
         FutureBuilder(
-          future: BookingServices.getNextAppointmentForBaby(),
+          future: BookingServices.getNextAppointment("baby"),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator(color: clr(1)));

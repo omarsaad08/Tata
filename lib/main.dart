@@ -25,23 +25,18 @@ void main() async {
 
 class MainApp extends StatelessWidget {
   final AppRouter appRouter;
-  // final User? user;
   const MainApp({super.key, required this.appRouter});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-          // fontFamily: "NotoSansArabic",
+          fontFamily: "NotoSansArabic",
           colorScheme: ColorScheme.light(
-        primary: clr(1),
-        // onPrimary: clr(5),
-        // onSurface: clr(1),
-      )),
+            primary: clr(1),
+          )),
       initialRoute: "login",
-      // initialRoute: "videoCallPage",
       onGenerateRoute: appRouter.generateRoute,
-      // for making the app RTL
       localizationsDelegates: [
         GlobalCupertinoLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
