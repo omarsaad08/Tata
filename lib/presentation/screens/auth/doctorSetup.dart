@@ -104,10 +104,15 @@ class _DoctorSetupState extends State<DoctorSetup> {
             children: [
               Expanded(
                 child: mainElevatedButton("تم", () async {
-                  final data = {
+                  final userData = {
                     'name': nameController.text,
                     'email': await Auth.getCurrentUserEmail(),
                     'phone': phoneNumberController.text,
+                    'role': "doctor"
+                  };
+                  final user = await Auth.saveUser(userData);
+                  final doctorData = {
+                    'user_id': user!['id'],
                     'city': cityController.text,
                     'address': addressController.text,
                     'speciality': selectedSpecialitiy,
@@ -116,15 +121,9 @@ class _DoctorSetupState extends State<DoctorSetup> {
                     'sessionPrice': sessionPriceController.text,
                     'experience': experience
                   };
-                  final result = await Auth.saveUser(data, type: 'doctor');
-                  if (result == 0) {
-                    Navigator.pushReplacementNamed(
-                        context, "inputAvailability");
-                  } else {
-                    setState(() {
-                      message = 'عذرا حدث خطا';
-                    });
-                  }
+                  final doctor =
+                      await Auth.saveUser(doctorData, type: "doctor");
+                  Navigator.pushReplacementNamed(context, "inputAvailability");
                 }),
               ),
               message != null

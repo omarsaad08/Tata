@@ -196,7 +196,7 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
             ),
             mainElevatedButton("العلامات التحذيرية", () {
               Navigator.pushNamed(context, 'warningSigns');
-            }, color: clr(5)),
+            }, color: clr(2)),
             mainElevatedButton("تم", () async {
               setState(() {
                 loading = true;

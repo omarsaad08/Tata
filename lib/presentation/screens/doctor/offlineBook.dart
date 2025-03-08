@@ -41,7 +41,7 @@ class _OfflineBookState extends State<OfflineBook> {
                             padding: EdgeInsets.all(12),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                color: clr(5)),
+                                color: clr(2)),
                             child: Column(
                               children: [
                                 Text(
@@ -75,7 +75,7 @@ class _OfflineBookState extends State<OfflineBook> {
               Row(
                 children: [
                   Expanded(
-                    child: mainElevatedButton("انهاء", () {}, color: clr(5)),
+                    child: mainElevatedButton("انهاء", () {}, color: clr(2)),
                   ),
                 ],
               ),

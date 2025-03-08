@@ -25,9 +25,15 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
-        return windows;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for windows - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -41,49 +47,29 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCfY4bWIiUV5QMarecfagq325RuBy1ySjU',
-    appId: '1:583073638100:web:2adf44b7dadea5c8603d41',
-    messagingSenderId: '583073638100',
-    projectId: 'tata-5e72c',
-    authDomain: 'tata-5e72c.firebaseapp.com',
-    storageBucket: 'tata-5e72c.appspot.com',
-    measurementId: 'G-SPFC0ZMLBW',
+    apiKey: 'AIzaSyCcBGbVao2fqPAMpfUiY03sPqgE-0zEwX4',
+    appId: '1:397693381447:web:f1b42a2e92d9907b32fa62',
+    messagingSenderId: '397693381447',
+    projectId: 'tata-47a2e',
+    authDomain: 'tata-47a2e.firebaseapp.com',
+    storageBucket: 'tata-47a2e.firebasestorage.app',
+    measurementId: 'G-H8SKYG0TXF',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBn_am4hiAq6IV1vq2xzP1iK0Xp4rzqmWw',
-    appId: '1:583073638100:android:ad750b2c7fc65ac8603d41',
-    messagingSenderId: '583073638100',
-    projectId: 'tata-5e72c',
-    storageBucket: 'tata-5e72c.appspot.com',
+    apiKey: 'AIzaSyAm2d79qNPp90dkpk0kqoLZR5_6pE9Slgc',
+    appId: '1:397693381447:android:335122238948e76032fa62',
+    messagingSenderId: '397693381447',
+    projectId: 'tata-47a2e',
+    storageBucket: 'tata-47a2e.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBGMsIGXUxvs8tWA7cGjWDcfFzxRBo51bc',
-    appId: '1:583073638100:ios:57d718e1eb727052603d41',
-    messagingSenderId: '583073638100',
-    projectId: 'tata-5e72c',
-    storageBucket: 'tata-5e72c.appspot.com',
-    iosBundleId: 'com.example.tata',
+    apiKey: 'AIzaSyCEGf0ffsMuRg1W2_Dky0tsB1TjXA1-s38',
+    appId: '1:397693381447:ios:7817e882147f94b832fa62',
+    messagingSenderId: '397693381447',
+    projectId: 'tata-47a2e',
+    storageBucket: 'tata-47a2e.firebasestorage.app',
+    iosBundleId: 'com.tata',
   );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBGMsIGXUxvs8tWA7cGjWDcfFzxRBo51bc',
-    appId: '1:583073638100:ios:57d718e1eb727052603d41',
-    messagingSenderId: '583073638100',
-    projectId: 'tata-5e72c',
-    storageBucket: 'tata-5e72c.appspot.com',
-    iosBundleId: 'com.example.tata',
-  );
-
-  static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyCfY4bWIiUV5QMarecfagq325RuBy1ySjU',
-    appId: '1:583073638100:web:dbfd1434cf38b9e1603d41',
-    messagingSenderId: '583073638100',
-    projectId: 'tata-5e72c',
-    authDomain: 'tata-5e72c.firebaseapp.com',
-    storageBucket: 'tata-5e72c.appspot.com',
-    measurementId: 'G-QPNTW1LE42',
-  );
-
 }

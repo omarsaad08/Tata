@@ -44,7 +44,7 @@ class _PreviousBookingsState extends State<PreviousBookings> {
                         Container(
                           padding: EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                              color: clr(5),
+                              color: clr(2),
                               borderRadius: BorderRadius.circular(12)),
                           child: Column(
                             children: [

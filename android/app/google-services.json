@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "583073638100",
-    "project_id": "tata-5e72c",
-    "storage_bucket": "tata-5e72c.appspot.com"
+    "project_number": "397693381447",
+    "project_id": "tata-47a2e",
+    "storage_bucket": "tata-47a2e.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:583073638100:android:ad750b2c7fc65ac8603d41",
+        "mobilesdk_app_id": "1:397693381447:android:335122238948e76032fa62",
         "android_client_info": {
           "package_name": "com.example.tata"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBn_am4hiAq6IV1vq2xzP1iK0Xp4rzqmWw"
+          "current_key": "AIzaSyAm2d79qNPp90dkpk0kqoLZR5_6pE9Slgc"
         }
       ],
       "services": {

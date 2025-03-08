@@ -114,7 +114,7 @@ class NextAppointmentState extends State<NextAppointment> {
                 //       child: mainElevatedButton("انهاء", () {
                 //         Navigator.pushNamed(context, 'finishAppointment',
                 //             arguments: widget.appointment);
-                //       }, color: clr(5)),
+                //       }, color: clr(2)),
                 //     ),
                 //   ],
                 // ),

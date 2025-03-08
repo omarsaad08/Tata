@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 final dio = Dio();
 final baseUrl = "http://192.168.1.219:3000";
 
 class DoctorServices {
+  static final supabase = Supabase.instance.client;
   static Future<List> getAllDoctors() async {
     try {
-      // print('going to get data');
-      Response response = await dio.get('$baseUrl/doctor');
-      if (response.statusCode != 200) {
-        throw Exception(response.data);
-      }
-      // print('doctors: ${response.data}');
-      return response.data;
+      final doctors = await supabase
+          .from("doctor")
+          .select("*, users(name)")
+          .eq("users.role", "doctor");
+
+      print("data: $doctors");
+      return doctors;
     } catch (e) {
-      return [];
-      throw Exception('error fetching docs: $e');
+      print("error getting all doctors: $e");
+      rethrow;
     }
   }
 

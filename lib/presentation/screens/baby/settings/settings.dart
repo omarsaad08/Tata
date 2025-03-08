@@ -12,11 +12,6 @@ class BabySettings extends StatefulWidget {
 class _BabySettingsState extends State<BabySettings> {
   List screens = [
     {
-      "icon": Icon(Icons.person),
-      "name": "الحساب",
-      "route": "accountHome",
-    },
-    {
       "icon": Icon(Icons.language),
       "name": "تغيير اللغة",
       "route": "changeLanguage"
@@ -26,7 +21,6 @@ class _BabySettingsState extends State<BabySettings> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: clr(4),
       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 20),
       child: ListView.builder(
         itemCount: screens.length,
@@ -41,8 +35,9 @@ class _BabySettingsState extends State<BabySettings> {
               }
             },
             child: Container(
+                margin: EdgeInsets.only(bottom: 8),
                 decoration: BoxDecoration(
-                    color: clr(0), borderRadius: BorderRadius.circular(12)),
+                    color: clr(3), borderRadius: BorderRadius.circular(50)),
                 padding: EdgeInsets.all(16),
                 child: Row(
                   children: [
@@ -52,7 +47,6 @@ class _BabySettingsState extends State<BabySettings> {
                     ),
                     Text(
                       screens[index]['name'],
-                      style: TextStyle(fontSize: 18),
                     ),
                   ],
                 )),

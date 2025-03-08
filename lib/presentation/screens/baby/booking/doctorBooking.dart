@@ -36,11 +36,13 @@ class _OfflineDoctorBookingState extends State<OfflineDoctorBooking> {
                     if (index == 0) {
                       return Column(
                         children: [
-                          SizedBox(),
                           Container(
                             padding: EdgeInsets.all(10),
-                            child: mainTextField(searchController,
-                                "بحث عن دكتور", Icon(Icons.search)),
+                            child: mainTextField(
+                              searchController,
+                              "بحث عن دكتور",
+                              Icon(Icons.search),
+                            ),
                           ),
                           DoctorCard(
                             doctor: doctors[index],
@@ -80,8 +82,8 @@ class DoctorCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.all(10),
-      color: clr(2),
+      margin: EdgeInsets.all(8),
+      color: clr(4),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -90,20 +92,17 @@ class DoctorCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Display the doctor's name
                     Text(
-                      doctor['name'],
+                      doctor['users']['name'],
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: clr(0)),
                     ),
-                    // Display the doctor's experience
-                    Text("الخبرة: ${doctor["experience"] ?? "0"}",
+                    Text("الخبرة: ${doctor["experience"]} سنوات",
                         style: TextStyle(color: clr(0))),
-                    SizedBox(height: 10),
-                    // Button to open the detailed screen
                   ],
                 ),
                 Column(
@@ -119,6 +118,9 @@ class DoctorCard extends StatelessWidget {
                   ],
                 ),
               ],
+            ),
+            SizedBox(
+              height: 16,
             ),
             Row(
               children: [

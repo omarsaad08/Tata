@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'dart:convert'; // For JSON decoding
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:tata/data/auth.dart';
-import 'package:tata/data/bookingServices.dart';
-import 'package:tata/data/paymentServices.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
-import 'package:tata/presentation/components/theme.dart'; // For date formatting
+import 'dart:math';
+import 'package:tata/presentation/components/theme.dart';
 
 class DoctorAvailabilityScreen extends StatefulWidget {
   final int doctorId;
@@ -19,371 +16,242 @@ class DoctorAvailabilityScreen extends StatefulWidget {
 }
 
 class _DoctorAvailabilityScreenState extends State<DoctorAvailabilityScreen> {
+  final supabase = Supabase.instance.client;
+  List<DateTime> availableDays = [];
+  List<String> availableTimes = [];
+  DateTime? selectedDate;
+  int selectedTimeIndex = 0;
+  String appointmentType = "online";
   bool isLoading = true;
-  bool hasError = false;
-  List<dynamic> availabilityData = [];
-  List<dynamic> bookedAppointments = [];
-  final DateFormat dateFormat = DateFormat('yyyy-MM-dd');
-  String? selectedDate;
-  String? selectedTime;
-  Map? bookingResponse;
-  String? onlineOrOffline;
-  // Arabic names for the days and months
-  final List<String> arabicDays = [
-    'الإثنين',
-    'الثلاثاء',
-    'الأربعاء',
-    'الخميس',
-    'الجمعة',
-    'السبت',
-    'الأحد',
-  ];
-
-  final List<String> arabicMonths = [
-    'يناير',
-    'فبراير',
-    'مارس',
-    'أبريل',
-    'مايو',
-    'يونيو',
-    'يوليو',
-    'أغسطس',
-    'سبتمبر',
-    'أكتوبر',
-    'نوفمبر',
-    'ديسمبر',
-  ];
-
+  String message = '';
   @override
   void initState() {
     super.initState();
-    fetchDoctorAvailability();
+    fetchAvailableDaysAndTimes();
   }
 
-  Future<void> fetchDoctorAvailability() async {
+  String generateRoomId() {
+    const String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    Random random = Random();
+    return String.fromCharCodes(
+      List.generate(
+          8, (index) => chars.codeUnitAt(random.nextInt(chars.length))),
+    );
+  }
+
+  Future<void> fetchAvailableDaysAndTimes() async {
     try {
-      final response = await http.get(Uri.parse(
-          'http://192.168.1.219:3000/doctorAvailability/week/${widget.doctorId}'));
-      if (response.statusCode == 200) {
-        print('data: ${response.body}');
-        final data = jsonDecode(response.body);
-        final booked = data['bookedAppointments'];
+      final response = await supabase
+          .from('doctor_availability')
+          .select('available_days, start_time, end_time')
+          .eq('doctor_id', widget.doctorId)
+          .single();
+
+      if (response == null) {
         setState(() {
-          availabilityData = data['availability'];
-          bookedAppointments = booked;
           isLoading = false;
-          hasError = false;
         });
-      } else {
-        throw Exception('Failed to load availability');
+        return;
       }
-    } catch (error) {
+
+      List<int> days = List<int>.from(response['available_days']);
+      String startTimeStr = response['start_time'];
+      String endTimeStr = response['end_time'];
+
+      DateTime now = DateTime.now();
+      int todayIndex = (now.weekday % 7) + 1;
+
+      List<DateTime> availableDateList = days.map((d) {
+        int difference = (d - todayIndex) % 7;
+        return now.add(
+            Duration(days: difference >= 0 ? difference : (difference + 7)));
+      }).toList();
+      availableDateList.sort();
+
+      DateTime startTime = DateFormat('HH:mm').parse(startTimeStr);
+      DateTime endTime = DateFormat('HH:mm').parse(endTimeStr);
+
+      List<String> times = [];
+      DateTime current = startTime;
+      while (current.isBefore(endTime)) {
+        times.add(
+            DateFormat('h:mm a', 'ar').format(current)); // Arabic time format
+        current = current.add(const Duration(minutes: 30));
+      }
+
+      setState(() {
+        availableDays = availableDateList;
+        availableTimes = times;
+        isLoading = false;
+      });
+    } catch (e) {
+      print("Error fetching available days and times: $e");
       setState(() {
         isLoading = false;
-        hasError = true;
       });
     }
   }
 
-  // Function to generate time slots with 30-minute intervals
-  List<String> generateTimeSlots(String startTime, String endTime) {
-    List<String> timeSlots = [];
-    DateTime start = DateTime.parse("1970-01-01 $startTime");
-    DateTime end = DateTime.parse("1970-01-01 $endTime");
-
-    while (start.isBefore(end)) {
-      timeSlots.add(DateFormat('HH:mm').format(start));
-      start = start.add(Duration(minutes: 30)); // 30-minute interval
+  void bookAppointment() async {
+    if (selectedDate == null || availableTimes.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("يرجى اختيار اليوم والوقت")),
+      );
+      return;
     }
 
-    return timeSlots;
-  }
+    // Convert Arabic time format back to 24-hour format (HH:mm)
+    DateTime parsedTime =
+        DateFormat('hh:mm a', 'ar').parse(availableTimes[selectedTimeIndex]);
+    String formattedTime = DateFormat('HH:mm').format(parsedTime);
+    final bookingData = {
+      "doctor_id": widget.doctorId,
+      "date": DateFormat('yyyy-MM-dd').format(selectedDate!),
+      "time": formattedTime,
+      "place": appointmentType,
+      "roomid": generateRoomId(),
+      "status": "requested",
+      "type": "examination"
+    };
 
-  // Check if a time slot is booked
-  bool isTimeSlotBooked(String date, String time) {
-    return bookedAppointments.any((appointment) =>
-        appointment['appointment_date'].startsWith(date) &&
-        appointment['appointment_time'] == time);
-  }
-
-  // Function to handle slot selection
-  void selectTimeSlot(String date, String time) {
-    setState(() {
-      selectedDate = date;
-      selectedTime = time;
-    });
-  }
-
-  String formatDateToArabic(DateTime date) {
-    String day = arabicDays[date.weekday - 1];
-    String month = arabicMonths[date.month - 1];
-    return '$day, $month ${date.day}'; // e.g., "الإثنين, يناير 1"
-  }
-
-  List<String> getNextSevenDays() {
-    DateTime today = DateTime.now();
-    return List.generate(7, (index) {
-      DateTime nextDay = today.add(Duration(days: index));
-      return dateFormat.format(nextDay); // Return formatted date string
-    });
+    final response = await supabase
+        .from("appointments")
+        .insert(bookingData)
+        .select()
+        .single();
+    if (response['appointment_id'] != null) {
+      setState(() {
+        message = "تم طلب حجز الجلسة بنجاح. سنخبركم عندما يوافق الطبيب عليها";
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('حجز', style: TextStyle(color: clr(0))),
+        title: Text('حجز', style: TextStyle(color: Colors.white)),
         backgroundColor: clr(1),
         centerTitle: true,
       ),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : hasError
-              ? Center(
-                  child:
-                      Text('خطأ في تحميل المواعيد')) // Error message in Arabic
-              : Column(
-                  children: [
-                    // Display week days as a vertical list
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: getNextSevenDays().length,
-                        itemBuilder: (context, index) {
-                          String currentDate = getNextSevenDays()[index];
-                          DateTime date = DateTime.parse(currentDate);
-
-                          // Use proper weekday matching
-                          List availableSlots = availabilityData.where((slot) {
-                            int weekday = date
-                                .weekday; // Get the actual weekday from Dart's DateTime
-                            return slot['weekday'] ==
-                                weekday; // Match the weekday directly
-                          }).toList();
-                          return Container(
-                            margin: EdgeInsets.all(8.0),
-                            padding: EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: clr(1),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    formatDateToArabic(date),
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: clr(0)),
-                                  ),
-                                ),
-                                Column(
-                                  children: availableSlots.isEmpty
-                                      ? [
-                                          Text('لا توجد مواعيد',
-                                              style: TextStyle(color: clr(0)))
-                                        ] // No slots message in Arabic
-                                      : availableSlots.map((slot) {
-                                          String startTime = slot['start_time'];
-                                          String endTime = slot['end_time'];
-                                          List<String> timeSlots =
-                                              generateTimeSlots(
-                                                  startTime, endTime);
-                                          return Column(
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Expanded(
-                                                      child: DropdownButton<
-                                                          String>(
-                                                    hint: Text('اختر موعدًا',
-                                                        style: TextStyle(
-                                                            color: clr(0))),
-                                                    value: timeSlots.contains(
-                                                                selectedTime) &&
-                                                            !isTimeSlotBooked(
-                                                                currentDate,
-                                                                selectedTime!)
-                                                        ? selectedTime
-                                                        : null, // Set to null if the selected time isn't available
-                                                    onChanged: (value) {
-                                                      selectTimeSlot(
-                                                          currentDate, value!);
-                                                    },
-                                                    items: timeSlots
-                                                        .map((timeSlot) {
-                                                      bool isBooked =
-                                                          isTimeSlotBooked(
-                                                              currentDate,
-                                                              timeSlot);
-                                                      return DropdownMenuItem<
-                                                          String>(
-                                                        value: isBooked
-                                                            ? null
-                                                            : timeSlot, // Set `value` to null for booked slots
-                                                        child: Text(
-                                                          isBooked
-                                                              ? '$timeSlot (محجوز)'
-                                                              : timeSlot,
-                                                          style: TextStyle(
-                                                            color: isBooked
-                                                                ? Colors.grey
-                                                                : Colors.black,
-                                                          ),
-                                                        ),
-                                                      );
-                                                    }).toList(),
-                                                  )),
-                                                ],
-                                              ),
-                                              Container(
-                                                // padding: EdgeInsets.all(8),
-                                                decoration: BoxDecoration(
-                                                    color: clr(2),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            12)),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: <Widget>[
-                                                    slot['online']
-                                                        ? Expanded(
-                                                            child:
-                                                                RadioListTile<
-                                                                    String>(
-                                                              title: Text(
-                                                                  'اونلاين',
-                                                                  style: TextStyle(
-                                                                      color: clr(
-                                                                          0))),
-                                                              value: 'online',
-                                                              groupValue:
-                                                                  onlineOrOffline,
-                                                              onChanged:
-                                                                  (String?
-                                                                      value) {
-                                                                setState(() {
-                                                                  onlineOrOffline =
-                                                                      value!;
-                                                                });
-                                                              },
-                                                            ),
-                                                          )
-                                                        : Container(),
-                                                    slot['offline']
-                                                        ? Expanded(
-                                                            child:
-                                                                RadioListTile<
-                                                                    String>(
-                                                              title: Text(
-                                                                  'اوفلاين',
-                                                                  style: TextStyle(
-                                                                      color: clr(
-                                                                          0))),
-                                                              value: 'offline',
-                                                              groupValue:
-                                                                  onlineOrOffline,
-                                                              onChanged:
-                                                                  (String?
-                                                                      value) {
-                                                                setState(() {
-                                                                  onlineOrOffline =
-                                                                      value!;
-                                                                });
-                                                              },
-                                                            ),
-                                                          )
-                                                        : Container(),
-                                                  ],
-                                                ),
-                                              )
-                                            ],
-                                          );
-                                        }).toList(),
-                                )
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    // Display payment details under selected slot
-                    if (selectedDate != null && selectedTime != null)
-                      Container(
-                        color: clr(2),
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: isLoading
+            ? Center(child: CircularProgressIndicator())
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text("اختر اليوم",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 10),
+                  availableDays.isEmpty
+                      ? Text("لا يوجد أيام متاحة",
+                          style: TextStyle(color: Colors.red))
+                      : Wrap(
+                          spacing: 10,
+                          children: availableDays.map((date) {
+                            return ChoiceChip(
+                              label:
+                                  Text(DateFormat('EEEE', 'ar').format(date)),
+                              selected: selectedDate == date,
+                              onSelected: (selected) {
+                                setState(() {
+                                  selectedDate = date;
+                                  selectedTimeIndex = 0;
+                                });
+                              },
+                              selectedColor: clr(1),
+                              backgroundColor: Colors.grey[300],
+                              labelStyle: TextStyle(
+                                  color: selectedDate == date
+                                      ? Colors.white
+                                      : Colors.black),
+                            );
+                          }).toList(),
+                        ),
+                  SizedBox(height: 20),
+                  if (availableTimes.isNotEmpty)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text("اختر الوقت",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('التاريخ المختار: $selectedDate',
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    color: clr(0))), // Selected date in Arabic
-                            SizedBox(height: 8),
-                            Text('الوقت المختار: $selectedTime',
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    color: clr(0))), // Selected time in Arabic
-                            SizedBox(height: 20),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: mainElevatedButton(
-                                    "احجز",
-                                    () async {
-                                      final baby_id = (await Auth.getCurrentUser(type: 'baby'))!['id'];
-                                      final data = {
-                                        "baby_id": baby_id,
-                                        "doctor_id": widget.doctorId,
-                                        "appointment_date": selectedDate
-                                            .toString()
-                                            .split('T')[0],
-                                        "appointment_time": selectedTime,
-                                        "status": "requested",
-                                        "type": "كشف",
-                                        "paid": false,
-                                        "online": true
-                                      };
-                                      BookingServices.bookingData = data;
-                                      // await initiatePaymobPayment(data);
-                                      Navigator.pushNamed(
-                                          context, 'bookingPayment');
-                                      print('booking data: ${data}');
-                                      // bookingResponse =
-                                      //     await BookingServices.bookADoctor(
-                                      //         data);
-                                      // setState(() {});
-                                    },
-                                  ),
-                                ),
-                              ],
+                            IconButton(
+                              icon: Icon(Icons.arrow_back),
+                              onPressed: selectedTimeIndex > 0
+                                  ? () {
+                                      setState(() {
+                                        selectedTimeIndex--;
+                                      });
+                                    }
+                                  : null,
                             ),
-                            bookingResponse != null
-                                ? Text(bookingResponse!['message'].toString(),
-                                    style: TextStyle(color: clr(0)))
-                                : Container(),
+                            Text(availableTimes[selectedTimeIndex],
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold)),
+                            IconButton(
+                              icon: Icon(Icons.arrow_forward),
+                              onPressed:
+                                  selectedTimeIndex < availableTimes.length - 1
+                                      ? () {
+                                          setState(() {
+                                            selectedTimeIndex++;
+                                          });
+                                        }
+                                      : null,
+                            ),
                           ],
                         ),
+                      ],
+                    ),
+                  SizedBox(height: 20),
+                  Text("نوع الفحص",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Radio(
+                        value: "online",
+                        groupValue: appointmentType,
+                        onChanged: (value) =>
+                            setState(() => appointmentType = value!),
                       ),
-                  ],
-                ),
+                      Text("أونلاين"),
+                      Radio(
+                        value: "offline",
+                        groupValue: appointmentType,
+                        onChanged: (value) =>
+                            setState(() => appointmentType = value!),
+                      ),
+                      Text("في العيادة"),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                          child: mainElevatedButton("طلب حجز", bookAppointment))
+                    ],
+                  ),
+                  SizedBox(
+                    height: 8,
+                  ),
+                  message != ''
+                      ? Text(
+                          message,
+                          textAlign: TextAlign.center,
+                        )
+                      : Container(),
+                ],
+              ),
+      ),
     );
-  }
-
-  // Example function for Paymob integration (add your actual logic here)
-  Future<void> initiatePaymobPayment(Map data) async {
-    final paymentKey = await PaymentServices.payWithPaymob(1);
-    if (paymentKey != null) {
-      print('got payment key');
-      final paymobIframeURL =
-          'https://accept.paymob.com/api/acceptance/iframes/872857?payment_token=$paymentKey';
-      Navigator.pushNamed(context, 'paymentGateway',
-          arguments: {"url": paymobIframeURL, "data": data});
-      // print(paymobIframeURL);
-      // Navigator.of(context).push(MaterialPageRoute(
-      //   builder: (_) => PaymentWebView(paymentUrl: paymobIframeURL),
-      // ));
-    }
   }
 }

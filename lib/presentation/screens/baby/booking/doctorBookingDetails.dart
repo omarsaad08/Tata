@@ -16,10 +16,7 @@ class _DoctorBookingDetailsState extends State<DoctorBookingDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text(
-              widget.doctor["name"] != null
-                  ? widget.doctor["name"]
-                  : "محمد محمد",
+          title: Text(widget.doctor['users']['name'],
               style: TextStyle(color: clr(0))),
           centerTitle: true,
           backgroundColor: clr(1)),
@@ -44,9 +41,7 @@ class _DoctorBookingDetailsState extends State<DoctorBookingDetails> {
                   children: [
                     // Doctor's name
                     Text(
-                      widget.doctor["name"] != null
-                          ? widget.doctor['name']
-                          : "محمد محمد",
+                      widget.doctor['users']['name'],
                       style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -56,21 +51,26 @@ class _DoctorBookingDetailsState extends State<DoctorBookingDetails> {
                     // Doctor's speciality
                     Text(
                       "التقييم: ",
-                      style: TextStyle(fontSize: 18, color: clr(0)),
+                      style: TextStyle(fontSize: 16, color: clr(0)),
                     ),
                     Text(
-                      "★★★★★",
-                      style: TextStyle(fontSize: 18, color: clr(6)),
+                      widget.doctor['rating'] != null
+                          ? "★"
+                          : "لم يتم تقييمه بعد",
+                      style: TextStyle(
+                          fontSize: 18,
+                          color: clr(0),
+                          fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 10),
                     // Doctor's experience
                     Text(
-                      "الخبرة: ${widget.doctor["experience"] ?? 0}",
+                      "الخبرة: ${widget.doctor["experience"]} سنوات",
                       style: TextStyle(fontSize: 18, color: clr(0)),
                     ),
                     SizedBox(height: 20),
                     // Any other information can go here
-                    Text("سعر الحجز: 100 جنيه",
+                    Text("سعر الحجز: ${widget.doctor['examinationPrice']} جنيه",
                         style: TextStyle(color: clr(0))),
                   ],
                 ),
@@ -84,7 +84,7 @@ class _DoctorBookingDetailsState extends State<DoctorBookingDetails> {
                       child: mainElevatedButton("حجز", () {
                     Navigator.pushNamed(context, 'doctorAvailability',
                         arguments: widget.doctor['id']);
-                  }, color: clr(5)))
+                  }, color: clr(2)))
                 ],
               )
             ],

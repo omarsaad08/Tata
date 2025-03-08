@@ -8,7 +8,7 @@ Widget mainTextField(
       decoration: InputDecoration(
           labelText: label,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(50),
           ),
           prefixIcon: icon,
           prefixIconColor: clr(1)));

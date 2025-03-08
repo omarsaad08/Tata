@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tata/data/auth.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
@@ -14,19 +15,30 @@ class _LoginState extends State<Login> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool isPasswordVisible = false;
+  bool loading = false;
   String? errorMessage = null;
 
   Future login() async {
+    setState(() {
+      loading = true;
+    });
     final user =
         await Auth.signIn(emailController.text, passwordController.text);
+    print("user: $user");
     if (user != null) {
-      final userType = (await Auth.getCurrentUser())!['type'];
+      final userType = (await Auth.getCurrentUser())!['role'];
+      print("userType: $userType");
       if (userType != null) {
+        print("user type: $userType");
         Navigator.pushReplacementNamed(context, "${userType}Home");
       }
+      setState(() {
+        loading = false;
+      });
     } else {
       setState(() {
         errorMessage = "البريد الالكتروني او كلمة المرور خطأ";
+        loading = false;
       });
     }
   }
@@ -122,6 +134,7 @@ class _LoginState extends State<Login> {
                     ],
                   ),
                   const SizedBox(height: 8),
+                  loading ? CircularProgressIndicator() : Container(),
                   errorMessage != null ? Text(errorMessage!) : Container(),
                   const SizedBox(height: 24),
                   Row(

@@ -12,72 +12,48 @@ class DoctorSettings extends StatefulWidget {
 
 class _DoctorSettingsState extends State<DoctorSettings> {
   List screens = [
-    {"icon": Icon(Icons.person), "name": "الحساب", "route": "accountHome"}
+    {
+      "icon": Icon(Icons.language),
+      "name": "تغيير اللغة",
+      "route": "changeLanguage"
+    },
+    {"icon": Icon(Icons.logout), "name": "تسجيل الخروج", "route": "logout"}
   ];
-  Future<String?> getImageUrl() async {
-    // final user = await Auth.getUser('${TataUser.id!}', TataUser.type!);
-    // return user!['profile_image_path'];
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          height: 16,
-        ),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(100),
-          child: FutureBuilder(
-            future: getImageUrl(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Container();
-              } else if (snapshot.hasError) {
-                return Container();
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 20),
+      child: ListView.builder(
+        itemCount: screens.length,
+        itemBuilder: (context, index) {
+          return InkWell(
+            onTap: () async {
+              if (screens[index]['route'] != "logout") {
+                Navigator.pushNamed(context, screens[index]['route']);
               } else {
-                return Image.network(
-                  'http://192.168.1.219:3000/${snapshot.data}',
-                  width: 160,
-                  height: 160,
-                );
+                await Auth.signOut();
+                Navigator.pushReplacementNamed(context, "login");
               }
             },
-          ),
-        ),
-        Expanded(
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 20),
-            child: ListView.builder(
-              itemCount: screens.length,
-              itemBuilder: (context, index) {
-                return InkWell(
-                  onTap: () {
-                    Navigator.pushNamed(context, screens[index]['route']);
-                  },
-                  child: Container(
-                      decoration: BoxDecoration(
-                          color: clr(4),
-                          borderRadius: BorderRadius.circular(12)),
-                      padding: EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          screens[index]['icon'],
-                          SizedBox(
-                            width: 12,
-                          ),
-                          Text(
-                            screens[index]['name'],
-                            style: TextStyle(fontSize: 18),
-                          ),
-                        ],
-                      )),
-                );
-              },
-            ),
-          ),
-        ),
-      ],
+            child: Container(
+                margin: EdgeInsets.only(bottom: 8),
+                decoration: BoxDecoration(
+                    color: clr(3), borderRadius: BorderRadius.circular(50)),
+                padding: EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    screens[index]['icon'],
+                    SizedBox(
+                      width: 12,
+                    ),
+                    Text(
+                      screens[index]['name'],
+                    ),
+                  ],
+                )),
+          );
+        },
+      ),
     );
   }
 }

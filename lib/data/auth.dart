@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:dio/dio.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:tata/data/notificationHandler.dart';
 
 class Auth {
   static final supabase = Supabase.instance.client;
@@ -19,11 +20,16 @@ class Auth {
 
   static Future<AuthResponse?> signIn(String email, String password) async {
     try {
-      final user = await supabase.auth
+      final user = await Supabase.instance.client.auth
           .signInWithPassword(email: email, password: password);
+      print("response: $user");
+      await NotificationHandler.saveDoctorToken();
       return user;
+    } on AuthException catch (e) {
+      print("Authentication Error: ${e.message}");
+      return null;
     } catch (e) {
-      print("error signing in: $e");
+      print("Unexpected Error: $e");
       return null;
     }
   }
