@@ -3,6 +3,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tata/data/auth.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
+import 'package:tata/presentation/screens/auth/privacyPolicyDialog.dart';
+
+import 'package:flutter/services.dart' show rootBundle;
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -12,6 +15,17 @@ class Signup extends StatefulWidget {
 }
 
 class _SignupState extends State<Signup> {
+  void _showPrivacyPolicy() async {
+    final markdownText = await rootBundle.loadString('privacy-policy.md');
+
+    showDialog(
+      context: context,
+      builder: (context) => PrivacyPolicyDialog(
+        markdownData: markdownText,
+      ),
+    );
+  }
+
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool isPasswordVisible = false;
@@ -160,6 +174,16 @@ class _SignupState extends State<Signup> {
                   const SizedBox(height: 8),
                   errorMessage != null ? Text(errorMessage!) : Container(),
                   const SizedBox(height: 24),
+                  Text("بتسجيل حسابك فأنت توافق على سياسة الخصوصية الخاصة بنا"),
+                  TextButton(
+                    onPressed: _showPrivacyPolicy,
+                    child: const Text(
+                      'عرض سياسة الخصوصية',
+                      style: TextStyle(
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
                   Row(
                     children: [
                       Expanded(

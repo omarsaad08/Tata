@@ -57,9 +57,17 @@ class AppRouter {
       case "offlineDoctorBooking":
         return MaterialPageRoute(builder: (context) => OfflineDoctorBooking());
       case "followUpResult":
-        final healthy = settings.arguments as bool;
+        final args = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
-            builder: (context) => FollowUpResult(healthy: healthy));
+          builder: (context) => FollowUpResult(
+            healthy: args['healthy'],
+            motorScore: args['motorScore'],
+            sensoryScore: args['sensoryScore'],
+            feedingScore: args['feedingScore'],
+            communicationScore: args['communicationScore'],
+            reportDetails: args['reportDetails'],
+          ),
+        );
       case 'warningSigns':
         return MaterialPageRoute(builder: (context) => WarningSigns());
       case "doctorBookingDetails":

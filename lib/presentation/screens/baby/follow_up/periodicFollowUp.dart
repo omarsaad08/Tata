@@ -267,10 +267,7 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
                   "feedingmilestones": values[1],
                   "communicationmilestones": values[2],
                   "sensorymilestones": values[3],
-                  // "score": (followUp.generateScore() * 100).floor(),
                   "healthy": followUp.healthy,
-                  // "ageInMonths":
-                  //     calculateAgeInMonths(DateTime(user!['date_of_birth'])),
                   "notes": notesController.text,
                 };
 
@@ -278,17 +275,39 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
                 final result =
                     await PeriodicFollowUpServices.addPeriodicFollowUp(data);
                 print('result: $result');
+
+                // Generate the report and scores before navigation
+                final report = followUp.generateReport();
+                final motorScore = followUp.motorScore;
+                final sensoryScore = followUp.sensoryScore;
+                final feedingScore = followUp.feedingScore;
+                final communicationScore = followUp.communicationScore;
+
                 // Clear all checkboxes after submission
                 clearAllCheckboxes();
                 setState(() {
                   loading = false;
                 });
+
                 if (context.mounted) {
-                  Navigator.pushNamed(context, "followUpResult",
-                      arguments: data['healthy']);
+                  Navigator.pushNamed(
+                    context,
+                    "followUpResult",
+                    arguments: {
+                      'healthy': data['healthy'],
+                      'motorScore': motorScore,
+                      'sensoryScore': sensoryScore,
+                      'feedingScore': feedingScore,
+                      'communicationScore': communicationScore,
+                      'reportDetails': report,
+                    },
+                  );
                 }
               } catch (e) {
                 print(e);
+                setState(() {
+                  loading = false;
+                });
               }
             }),
             SizedBox(height: 8),

@@ -14,6 +14,13 @@ class FollowUp {
   bool healthy = true;
   int counter = 0;
   int age = 0;
+
+  // New scoring properties
+  double motorScore = 0;
+  double sensoryScore = 0;
+  double feedingScore = 0;
+  double communicationScore = 0;
+
   FollowUp(this.age) {
     setup(age);
   }
@@ -489,6 +496,27 @@ class FollowUp {
       sensoryValues.add(milestone['isChecked']);
       milestone['isChecked'] ? null : sensoryCounter++;
     }
+    // Calculate scores for each category
+    motorScore = motorMilestones.isEmpty
+        ? 0
+        : (motorValues.where((v) => v == true).length /
+                motorMilestones.length) *
+            100;
+    sensoryScore = sensoryMilestones.isEmpty
+        ? 0
+        : (sensoryValues.where((v) => v == true).length /
+                sensoryMilestones.length) *
+            100;
+    feedingScore = feedingMilestones.isEmpty
+        ? 0
+        : (feedingValues.where((v) => v == true).length /
+                feedingMilestones.length) *
+            100;
+    communicationScore = communicationMilestones.isEmpty
+        ? 0
+        : (communicationValues.where((v) => v == true).length /
+                communicationMilestones.length) *
+            100;
     print("age: $age");
     if (age >= 18) {
       if (motorCounter > 2 || communicationCounter > 1 || sensoryCounter > 1) {
@@ -504,6 +532,27 @@ class FollowUp {
     }
     // print([motorCounter, feedingCounter, communicationCounter, sensoryCounter]);
     return [motorValues, feedingValues, communicationValues, sensoryValues];
+  }
+
+  String generateReport() {
+    generateValues(); // Ensure scores are calculated
+
+    String report = "تقرير الطفل\n\n";
+    report += "🧠 النمو الحركي: ${motorScore.toStringAsFixed(0)}%\n";
+    report += "👂 النمو الحسي: ${sensoryScore.toStringAsFixed(0)}%\n";
+    report += "🍼 التغذية: ${feedingScore.toStringAsFixed(0)}%\n";
+    report += "🗣 التواصل: ${communicationScore.toStringAsFixed(0)}%\n\n";
+
+    // Add warnings for weak areas
+    if (motorScore < 60) report += "⚠ يحتاج إلى متابعة الحركات.\n";
+    if (sensoryScore < 60) report += "⚠ يحتاج إلى متابعة النمو الحسي.\n";
+    if (feedingScore < 60) report += "⚠ مشاكل محتملة في التغذية.\n";
+    if (communicationScore < 60) report += "⚠ يحتاج إلى متابعة التواصل.\n";
+
+    // Add overall health status
+    report += "\nالحالة العامة: ${healthy ? "سليم" : "يحتاج إلى متابعة"}";
+
+    return report;
   }
 
   double generateScore() {
