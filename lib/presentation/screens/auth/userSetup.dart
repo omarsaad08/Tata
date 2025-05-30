@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tata/extensions/translation_extension.dart';
 import 'package:tata/presentation/components/theme.dart';
 
 class UserSetup extends StatelessWidget {
@@ -27,7 +28,8 @@ class UserSetup extends StatelessWidget {
                       SizedBox(
                         height: 16,
                       ),
-                      Text("طفل", style: TextStyle(color: clr(0), fontSize: 28))
+                      Text(context.tr("baby"),
+                          style: TextStyle(color: clr(0), fontSize: 28))
                     ],
                   ),
                 ),
@@ -48,7 +50,8 @@ class UserSetup extends StatelessWidget {
                     SizedBox(
                       height: 16,
                     ),
-                    Text("دكتور", style: TextStyle(color: clr(0), fontSize: 28))
+                    Text(context.tr("doctor"),
+                        style: TextStyle(color: clr(0), fontSize: 28))
                   ],
                 ),
               ),

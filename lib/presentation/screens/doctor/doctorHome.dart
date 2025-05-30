@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:tata/data/notificationHandler.dart';
+import 'package:tata/data/doctorServices.dart';
+import 'package:tata/data/userServices.dart';
+import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
 import 'package:tata/presentation/screens/doctor/settings/settings.dart';
 
@@ -18,13 +19,6 @@ class _DoctorHomeState extends State<DoctorHome> {
     setState(() {
       _selectedIndex = index;
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    NotificationHandler.listenForNewAppointments();
   }
 
   final List<Widget> _screens = [
@@ -70,7 +64,17 @@ class _DoctorHomeState extends State<DoctorHome> {
             label: 'الرئيسية',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+            icon: FutureBuilder(
+                future: UserServices.getUserImage(40),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting ||
+                      snapshot.hasError ||
+                      !snapshot.hasData) {
+                    return Icon(Icons.person);
+                  } else {
+                    return snapshot.data!;
+                  }
+                }),
             label: 'الحساب',
           ),
         ],
@@ -87,13 +91,166 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  Map<String, dynamic>? user;
+  List<dynamic>? appointments;
+  bool isUserLoading = true;
+  bool isAppointmentsLoading = true;
+  String? userError;
+  String? appointmentsError;
+
   @override
   void initState() {
     super.initState();
+    _fetchData();
+  }
+
+  Future<void> _fetchData() async {
+    try {
+      // Fetch user and appointments in parallel
+      final userFuture = UserServices.fetchFullUserData();
+      final appointmentsFuture = DoctorServices.getTodaysAppointments();
+
+      final List results = await Future.wait([userFuture, appointmentsFuture]);
+
+      setState(() {
+        user = results[0];
+        isUserLoading = false;
+      });
+
+      setState(() {
+        appointments = results[1];
+        isAppointmentsLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isUserLoading = false;
+        isAppointmentsLoading = false;
+        userError = "حدث خطأ في تحميل البيانات";
+        appointmentsError = "حدث خطأ في تحميل الحجوزات";
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          // User Info
+          if (isUserLoading)
+            Center(child: Text("..."))
+          else if (userError != null)
+            Center(child: Text(userError!))
+          else
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              decoration: BoxDecoration(
+                color: clr(3),
+                borderRadius: BorderRadius.circular(50),
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 4,
+                      offset: Offset(0, 2))
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("أهلاً دكتور ${user!['name']}!"),
+                  Text("التخصص: ${user!['doctor']['speciality']}"),
+                ],
+              ),
+            ),
+
+          SizedBox(height: 16),
+          FutureBuilder(
+              future: DoctorServices.getNextAppointment(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else {
+                  return Row(
+                    children: [
+                      Expanded(
+                          child: mainElevatedButton("الحجز القادم", () {
+                        Navigator.pushNamed(context, "nextAppointmentDoctor",
+                            arguments: snapshot.data);
+                      }))
+                    ],
+                  );
+                }
+              }),
+          Text("حجوزات اليوم",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          SizedBox(height: 8),
+
+          // Appointments
+          if (isAppointmentsLoading)
+            Center(child: CircularProgressIndicator())
+          else if (appointmentsError != null)
+            Center(child: Text(appointmentsError!))
+          else if (appointments == null || appointments!.isEmpty)
+            Center(child: Text("لا يوجد حجوزات اليوم"))
+          else
+            SizedBox(
+              height: 150,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: appointments!.length,
+                itemBuilder: (context, index) {
+                  final appointment = appointments![index];
+                  return Container(
+                    width: 200,
+                    margin: EdgeInsets.symmetric(horizontal: 8),
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: clr(1),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(color: Colors.black12, blurRadius: 4)
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                            appointment['type'] == "examination" ? "كشف" : "جلسة",
+                            style: TextStyle(
+                                color: clr(0), fontWeight: FontWeight.bold)),
+                        Text("الوقت: ${appointment['time']}",
+                            style: TextStyle(color: clr(0))),
+                        Text(
+                          "الحالة: ${_getAppointmentStatus(appointment['status'])}",
+                          style: TextStyle(color: clr(0)),
+                        ),
+                        SizedBox(height: 8),
+                        mainElevatedButton("الدخول", () {
+                          Navigator.pushNamed(context, "enterAppointment",
+                              arguments: appointment);
+                        }, color: clr(2))
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  String _getAppointmentStatus(String status) {
+    switch (status) {
+      case "pending":
+        return "في الانتظار";
+      case "canceled":
+        return "ملغي";
+      case "finished":
+        return "منتهي";
+      default:
+        return "";
+    }
   }
 }

@@ -4,7 +4,7 @@ import 'package:tata/presentation/components/theme.dart';
 Widget mainElevatedButton(String text, VoidCallback onPressed, {Color? color}) {
   return ElevatedButton(
     style: ElevatedButton.styleFrom(
-        backgroundColor: color == null ? clr(1) : color,
+        backgroundColor: color ?? clr(1),
         padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16)),
     onPressed: onPressed,
     child: Text(

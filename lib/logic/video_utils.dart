@@ -17,9 +17,9 @@ bool checkNoSignleDigit(int no) {
 
 String generateRandomString(int len) {
   var r = Random();
-  const _chars =
+  const chars =
       'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
-  return List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
+  return List.generate(len, (index) => chars[r.nextInt(chars.length)]).join();
 }
 
 void shareToApps(String roomId) async {
@@ -34,21 +34,8 @@ Future<bool> handlePermissionsForCall(BuildContext context) async {
   Map<Permission, PermissionStatus> statuses = await [
     Permission.camera,
     Permission.microphone,
-    Permission.storage,
   ].request();
-
-  if (statuses[Permission.storage]?.isPermanentlyDenied ?? false) {
-    showCustomDialog(
-      context,
-      "Permission Required",
-      "Storage Permission Required for Video Call",
-      () {
-        Navigator.pop(context);
-        openAppSettings();
-      },
-    );
-    return false;
-  } else if (statuses[Permission.camera]?.isPermanentlyDenied ?? false) {
+  if (statuses[Permission.camera]?.isPermanentlyDenied ?? false) {
     showCustomDialog(
       context,
       "Permission Required",
@@ -69,10 +56,6 @@ Future<bool> handlePermissionsForCall(BuildContext context) async {
         openAppSettings();
       },
     );
-    return false;
-  }
-
-  if (statuses[Permission.storage]?.isDenied ?? false) {
     return false;
   } else if (statuses[Permission.camera]?.isDenied ?? false) {
     return false;
@@ -107,11 +90,11 @@ void showCustomDialog(
         ),
         actions: <Widget>[
           TextButton(
+            onPressed: okPressed,
             child: Text(
               "OK",
               style: TextStyle(fontFamily: 'WorkSansMedium'),
             ),
-            onPressed: okPressed,
           ),
         ],
       );

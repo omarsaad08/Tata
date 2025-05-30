@@ -3,6 +3,7 @@ import 'package:tata/data/auth.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/mainTextField.dart';
 import 'package:tata/presentation/components/theme.dart';
+import 'package:tata/extensions/translation_extension.dart';
 
 class DoctorSetup extends StatefulWidget {
   const DoctorSetup({super.key});
@@ -34,26 +35,23 @@ class _DoctorSetupState extends State<DoctorSetup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("تسجيل دكتور", style: TextStyle(color: clr(0))),
-        centerTitle: true,
-        backgroundColor: clr(1),
-      ),
       body: Container(
         padding: EdgeInsets.all(12),
         child: ListView(children: [
-          mainTextField(
-              nameController, 'اسم الدكتور', Icon(Icons.local_hospital)),
+          mainTextField(nameController, context.tr("doctor-name"),
+              Icon(Icons.local_hospital)),
           SizedBox(height: 12),
           mainTextField(
-              phoneNumberController, "رقم هاتف الدكتور", Icon(Icons.phone)),
+              phoneNumberController, context.tr("phone"), Icon(Icons.phone)),
           SizedBox(height: 12),
-          mainTextField(cityController, "المدينة", Icon(Icons.location_city)),
+          mainTextField(
+              cityController, context.tr("city"), Icon(Icons.location_city)),
           SizedBox(height: 12),
-          mainTextField(addressController, "العنوان", Icon(Icons.map)),
+          mainTextField(
+              addressController, context.tr("address"), Icon(Icons.map)),
           SizedBox(height: 12),
           DropdownButton<String>(
-              hint: Text('اختر تخصصك'),
+              hint: Text(context.tr("speciality")),
               value: selectedSpecialitiy,
               items: specialities.map((String item) {
                 return DropdownMenuItem<String>(value: item, child: Text(item));
@@ -65,7 +63,7 @@ class _DoctorSetupState extends State<DoctorSetup> {
               }),
           SizedBox(height: 12),
           DropdownButton<String>(
-              hint: Text('اختر نوع الجلسات التي تقدمها'),
+              hint: Text(context.tr("choose-type-of-sessions")),
               value: selectedSession,
               items: sessions.map((String item) {
                 return DropdownMenuItem<String>(value: item, child: Text(item));
@@ -76,13 +74,13 @@ class _DoctorSetupState extends State<DoctorSetup> {
                 });
               }),
           SizedBox(height: 12),
-          mainTextField(
-              examinationPriceController, 'سعر الكشف', Icon(Icons.money)),
+          mainTextField(examinationPriceController,
+              context.tr("examination-price"), Icon(Icons.money)),
           SizedBox(height: 12),
-          mainTextField(
-              sessionPriceController, "سعر الجلسة", Icon(Icons.attach_money)),
+          mainTextField(sessionPriceController, context.tr("session-price"),
+              Icon(Icons.attach_money)),
           SizedBox(height: 12),
-          Text("سنوات الخبرة"),
+          Text(context.tr("years-of-experience")),
           SizedBox(height: 12),
           DropdownButton<int>(
             value: experience,
@@ -103,10 +101,30 @@ class _DoctorSetupState extends State<DoctorSetup> {
           Row(
             children: [
               Expanded(
-                child: mainElevatedButton("تم", () async {
+                child: mainElevatedButton(context.tr("done"), () async {
+                  // Validate all fields
+                  if (nameController.text.isEmpty ||
+                      phoneNumberController.text.isEmpty ||
+                      cityController.text.isEmpty ||
+                      addressController.text.isEmpty ||
+                      selectedSpecialitiy == null ||
+                      selectedSession == null ||
+                      examinationPriceController.text.isEmpty ||
+                      sessionPriceController.text.isEmpty ||
+                      experience == 0) {
+                    setState(() {
+                      message = context.tr("please-fill-fields");
+                    });
+                    return; // Stop further execution if validation fails
+                  }
+
+                  setState(() {
+                    message = ''; // Clear any previous error messages
+                  });
+
                   final userData = {
                     'name': nameController.text,
-                    'email': await Auth.getCurrentUserEmail(),
+                    'email': Auth.getCurrentUserEmail(),
                     'phone': phoneNumberController.text,
                     'role': "doctor"
                   };
@@ -127,7 +145,7 @@ class _DoctorSetupState extends State<DoctorSetup> {
                 }),
               ),
               message != null
-                  ? Text(message!)
+                  ? Text(message!, style: TextStyle(color: Colors.red))
                   : message == ''
                       ? CircularProgressIndicator(color: clr(1))
                       : Container()

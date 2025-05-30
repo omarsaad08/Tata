@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tata/data/doctorServices.dart';
+import 'package:tata/data/userServices.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/mainTextField.dart';
 import 'package:tata/presentation/components/theme.dart';
@@ -13,63 +14,78 @@ class OfflineDoctorBooking extends StatefulWidget {
 
 class _OfflineDoctorBookingState extends State<OfflineDoctorBooking> {
   TextEditingController searchController = TextEditingController();
+  List doctors = [];
+  List filteredDoctors = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchDoctors();
+    searchController.addListener(_filterDoctors);
+  }
+
+  Future<void> _fetchDoctors() async {
+    try {
+      final data = await DoctorServices.getAllDoctors();
+      setState(() {
+        doctors = data;
+        filteredDoctors = doctors; // Initially, show all doctors
+      });
+    } catch (e) {
+      print("Error fetching doctors: $e");
+    }
+  }
+
+  void _filterDoctors() {
+    String query = searchController.text.toLowerCase();
+    setState(() {
+      filteredDoctors = doctors
+          .where(
+              (doctor) => doctor['users']['name'].toLowerCase().contains(query))
+          .toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-            title: Text("حجز دكتور", style: TextStyle(color: clr(0))),
-            centerTitle: true,
-            backgroundColor: clr(1)),
-        body: FutureBuilder(
-          future: DoctorServices.getAllDoctors(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text('خطأ: ${snapshot.error}'));
-            } else if (snapshot.hasData) {
-              final doctors = snapshot.data!;
-              return ListView.builder(
-                itemCount: doctors.length,
-                itemBuilder: (context, index) {
-                  if (doctors.length != 0) {
-                    if (index == 0) {
-                      return Column(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.all(10),
-                            child: mainTextField(
-                              searchController,
-                              "بحث عن دكتور",
-                              Icon(Icons.search),
-                            ),
-                          ),
-                          DoctorCard(
-                            doctor: doctors[index],
-                            onPressed: () {
-                              // Navigate to the doctor's detail screen
-                            },
-                          ),
-                        ],
-                      );
-                    } else {
+      appBar: AppBar(
+        title: Text("حجز دكتور", style: TextStyle(color: clr(0))),
+        centerTitle: true,
+        backgroundColor: clr(1),
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.all(10),
+            child: mainTextField(
+              searchController,
+              "بحث عن دكتور",
+              Icon(Icons.search),
+            ),
+          ),
+          Expanded(
+            child: filteredDoctors.isEmpty
+                ? Center(child: Text("لا يوجد دكتور متوفر حاليا"))
+                : ListView.builder(
+                    itemCount: filteredDoctors.length,
+                    itemBuilder: (context, index) {
                       return DoctorCard(
-                        doctor: doctors[index],
+                        doctor: filteredDoctors[index],
                         onPressed: () {
-                          // Navigate to the doctor's detail screen
+                          Navigator.pushNamed(
+                            context,
+                            "doctorBookingDetails",
+                            arguments: filteredDoctors[index],
+                          );
                         },
                       );
-                    }
-                  } else {
-                    return Center(child: Text("لا يوجد دكتور متوفر حاليا"));
-                  }
-                },
-              );
-            } else {
-              return Text("unknown error");
-            }
-          },
-        ));
+                    },
+                  ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -77,7 +93,7 @@ class DoctorCard extends StatelessWidget {
   final Map doctor;
   final VoidCallback onPressed;
 
-  DoctorCard({required this.doctor, required this.onPressed});
+  const DoctorCard({super.key, required this.doctor, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -107,28 +123,27 @@ class DoctorCard extends StatelessWidget {
                 ),
                 Column(
                   children: [
-                    Text(
-                      doctor['city'],
-                      style: TextStyle(fontSize: 16, color: clr(0)),
-                    ),
-                    Text(
-                      doctor['address'],
-                      style: TextStyle(fontSize: 16, color: clr(0)),
-                    ),
+                    FutureBuilder(
+                        future: UserServices.getUserImage(80),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                                  ConnectionState.waiting ||
+                              snapshot.hasError ||
+                              !snapshot.hasData) {
+                            return Icon(Icons.person);
+                          } else {
+                            return snapshot.data!;
+                          }
+                        })
                   ],
                 ),
               ],
             ),
-            SizedBox(
-              height: 16,
-            ),
+            SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
-                  child: mainElevatedButton("تفاصيل", () {
-                    Navigator.pushNamed(context, "doctorBookingDetails",
-                        arguments: doctor);
-                  }),
+                  child: mainElevatedButton("تفاصيل", onPressed),
                 )
               ],
             )

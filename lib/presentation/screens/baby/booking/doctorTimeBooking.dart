@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 
 class DoctorTimeBooking extends StatefulWidget {
   final int doctorId;
-  DoctorTimeBooking({required this.doctorId});
+  const DoctorTimeBooking({super.key, required this.doctorId});
   @override
   _DoctorTimeBookingState createState() => _DoctorTimeBookingState();
 }

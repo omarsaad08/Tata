@@ -5,7 +5,7 @@ import 'package:tata/presentation/components/theme.dart';
 class DoctorBookingDetails extends StatefulWidget {
   final Map doctor;
 
-  DoctorBookingDetails({required this.doctor});
+  const DoctorBookingDetails({super.key, required this.doctor});
 
   @override
   State<DoctorBookingDetails> createState() => _DoctorBookingDetailsState();

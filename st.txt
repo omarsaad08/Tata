@@ -1,0 +1,31 @@
+lib/
+├── main.dart
+├── app.dart                  # Root widget, theme, localization setup
+├── core/                     # Core utilities & constants used app-wide
+│   ├── constants.dart
+│   ├── localization/         # i18n logic, localization delegates, translations
+│   ├── utils.dart
+│   └── extensions.dart
+├── models/                   # Data models (e.g., User, Post)
+│   └── user.dart
+├── services/                 # API clients, Supabase wrapper, auth logic
+│   └── supabase_service.dart
+├── providers/                # Riverpod providers, state notifiers, controllers
+│   ├── auth_provider.dart
+│   ├── user_provider.dart
+│   └── ...
+├── repositories/             # Abstractions for data access, using services
+│   └── auth_repository.dart
+├── features/                 # Feature-based UI & logic
+│   ├── auth/                 # Authentication related screens & widgets
+│   │   ├── screens/
+│   │   │   ├── login_screen.dart
+│   │   │   ├── forgot_password_screen.dart
+│   │   └── widgets/
+│   │       └── login_form.dart
+│   └── home/                 # Home feature module
+│       ├── screens/
+│       └── widgets/
+├── l10n/                     # Localization resource files (e.g. ARB or JSON)
+└── widgets/                  # Shared widgets used across features
+    └── custom_button.dart

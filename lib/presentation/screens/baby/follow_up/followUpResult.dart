@@ -43,15 +43,34 @@ class _FollowUpResultState extends State<FollowUpResult> {
                       SizedBox(
                         height: 48,
                       ),
+                      // Row(
+                      //   children: [
+                      //     SizedBox(
+                      //       width: 8,
+                      //     ),
+                      //     Expanded(
+                      //       child: mainElevatedButton("احجز مع دكتور", () {
+                      //         Navigator.pushNamed(
+                      //             context, "offlineDoctorBooking");
+                      //       }),
+                      //     ),
+                      //     SizedBox(
+                      //       width: 8,
+                      //     ),
+                      //   ],
+                      // ),
+                      SizedBox(
+                        height: 48,
+                      ),
                       Row(
                         children: [
                           SizedBox(
                             width: 8,
                           ),
                           Expanded(
-                            child: mainElevatedButton("احجز مع دكتور", () {
-                              Navigator.pushNamed(
-                                  context, "offlineDoctorBooking");
+                            child: mainElevatedButton("الرجوع للصفحة الرئيسية",
+                                () {
+                              Navigator.pushNamed(context, "babyHome");
                             }),
                           ),
                           SizedBox(

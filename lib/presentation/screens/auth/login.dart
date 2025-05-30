@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tata/data/auth.dart';
+import 'package:tata/extensions/translation_extension.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
 
@@ -16,7 +16,7 @@ class _LoginState extends State<Login> {
   TextEditingController passwordController = TextEditingController();
   bool isPasswordVisible = false;
   bool loading = false;
-  String? errorMessage = null;
+  String? errorMessage;
 
   Future login() async {
     setState(() {
@@ -37,7 +37,7 @@ class _LoginState extends State<Login> {
       });
     } else {
       setState(() {
-        errorMessage = "البريد الالكتروني او كلمة المرور خطأ";
+        errorMessage = context.tr("email-or-password-wrong");
         loading = false;
       });
     }
@@ -62,9 +62,9 @@ class _LoginState extends State<Login> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("إبدأ أول تاتا",
+                  Text(context.tr("login-title"),
                       style: TextStyle(color: clr(0), fontSize: 32)),
-                  Text("تسجيل الدخول",
+                  Text(context.tr("login"),
                       style: TextStyle(color: clr(0), fontSize: 20))
                 ],
               ),
@@ -84,7 +84,7 @@ class _LoginState extends State<Login> {
                     },
                     controller: emailController,
                     decoration: InputDecoration(
-                      labelText: 'البريد الإلكتروني',
+                      labelText: context.tr("email"),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -104,7 +104,7 @@ class _LoginState extends State<Login> {
                     controller: passwordController,
                     obscureText: !isPasswordVisible,
                     decoration: InputDecoration(
-                      labelText: 'كلمة المرور',
+                      labelText: context.tr("password"),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -130,7 +130,10 @@ class _LoginState extends State<Login> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       TextButton(
-                          onPressed: () {}, child: Text("نسيت كلمة المرور؟")),
+                          onPressed: () {
+                            Navigator.pushNamed(context, 'forgotPassword');
+                          },
+                          child: Text(context.tr("forget password"))),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -140,7 +143,7 @@ class _LoginState extends State<Login> {
                   Row(
                     children: [
                       Expanded(
-                        child: mainElevatedButton("تسجيل الدخول", login),
+                        child: mainElevatedButton(context.tr("login"), login),
                       ),
                     ],
                   ),
@@ -151,8 +154,8 @@ class _LoginState extends State<Login> {
                     onPressed: () {
                       Navigator.popAndPushNamed(context, "signup");
                     },
-                    child: const Text(
-                      'معندكش حساب؟ إنشاء حساب جديد',
+                    child: Text(
+                      context.tr("don't have an account"),
                       style: TextStyle(fontSize: 16),
                     ),
                   ),

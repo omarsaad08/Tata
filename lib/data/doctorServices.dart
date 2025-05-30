@@ -1,13 +1,24 @@
-import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:dio/dio.dart';
+import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-final dio = Dio();
-final baseUrl = "http://192.168.1.219:3000";
+import 'package:tata/data/auth.dart';
 
 class DoctorServices {
   static final supabase = Supabase.instance.client;
+  static Future<List> getTodaysAppointments() async {
+    try {
+      final doctorId = (await Auth.getCurrentUser(type: "doctor"))!['id'];
+      final data = await supabase
+          .from("appointments")
+          .select("*")
+          .eq("date", DateTime.now().toIso8601String().split('T')[0])
+          .neq("status", "requested");
+      return data;
+    } catch (e) {
+      print("error getting today's appointments: $e");
+      rethrow;
+    }
+  }
+
   static Future<List> getAllDoctors() async {
     try {
       final doctors = await supabase
@@ -15,7 +26,6 @@ class DoctorServices {
           .select("*, users(name)")
           .eq("users.role", "doctor");
 
-      print("data: $doctors");
       return doctors;
     } catch (e) {
       print("error getting all doctors: $e");
@@ -23,41 +33,23 @@ class DoctorServices {
     }
   }
 
-  static Future<Map> getDoctor() async {
+  static Future<Map?> getNextAppointment() async {
     try {
-      Response response = await dio.get('$baseUrl/doctor');
-      if (response.statusCode != 200) throw Exception(response.data);
-      return response.data;
+      final doctorId = (await Auth.getCurrentUser(type: "doctor"))!['id'];
+      final response = await supabase
+          .from("appointments")
+          .select("*")
+          .eq("doctor_id", doctorId)
+          .gte("date", DateFormat('yyyy-MM-dd').format(DateTime.now()))
+          .order("date", ascending: true)
+          .order("time", ascending: true)
+          .limit(1)
+          .maybeSingle();
+      print("appointment: $response");
+      return response;
     } catch (e) {
-      throw Exception("error getting a doctor: $e");
-    }
-  }
-
-  static Future<void> addDoctor(Map data) async {
-    try {
-      Response response =
-          await dio.post('$baseUrl/doctor', data: json.encode(data));
-      if (response.statusCode != 200) throw Exception(response.data);
-    } catch (e) {
-      throw Exception("error adding a doctor to the system: $e");
-    }
-  }
-
-  static Future<void> updateDoctor(Map data) async {
-    try {
-      Response response = await dio.put('$baseUrl/doctor');
-      if (response.statusCode != 200) throw Exception(response.data);
-    } catch (e) {
-      throw Exception("error updating doctor's data: ${e}");
-    }
-  }
-
-  static Future<void> deleteDoctor() async {
-    try {
-      Response response = await dio.delete('$baseUrl/doctor');
-      if (response.statusCode != 200) throw Exception(response.data);
-    } catch (e) {
-      throw Exception("error deleting doctor: ${e}");
+      print("error fetching next appointment: $e");
+      return null;
     }
   }
 }

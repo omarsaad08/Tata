@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:tata/data/auth.dart';
 import 'package:tata/data/periodicFollowUpServices.dart';
+import 'package:tata/extensions/translation_extension.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/mainTextField.dart';
 import 'package:tata/presentation/components/theme.dart';
@@ -21,9 +22,9 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
   bool loading = false;
   TextEditingController notesController = TextEditingController();
   void _handleCheckboxChange(
-      int index, bool? value, List<Map<String, dynamic>> _checklistItems) {
+      int index, bool? value, List<Map<String, dynamic>> checklistItems) {
     setState(() {
-      _checklistItems[index]['isChecked'] = value;
+      checklistItems[index]['isChecked'] = value;
     });
   }
 
@@ -75,7 +76,8 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text("المتابعة الدورية", style: TextStyle(color: clr(0))),
+          title: Text(context.tr("periodic-followup"),
+              style: TextStyle(color: clr(0))),
           centerTitle: true,
           backgroundColor: clr(1)),
       body: Container(
@@ -85,7 +87,7 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
             Column(
               children: <Widget>[
                 RadioListTile<String>(
-                  title: Text('من سن 0 الى 3 شهور'),
+                  title: Text(context.tr("age-group-3")),
                   value: '3',
                   groupValue: selectedOption,
                   onChanged: (value) {
@@ -93,7 +95,7 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
                   },
                 ),
                 RadioListTile<String>(
-                  title: Text('من سن 4 الى 6 شهور'),
+                  title: Text(context.tr("age-group-6")),
                   value: '6',
                   groupValue: selectedOption,
                   onChanged: (value) {
@@ -101,7 +103,7 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
                   },
                 ),
                 RadioListTile<String>(
-                  title: Text('من سن 7 الى 9 شهور'),
+                  title: Text(context.tr("age-group-9")),
                   value: '9',
                   groupValue: selectedOption,
                   onChanged: (value) {
@@ -109,8 +111,56 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
                   },
                 ),
                 RadioListTile<String>(
-                  title: Text('من سن 10 الى 12 شهور'),
+                  title: Text(context.tr("age-group-12")),
                   value: '12',
+                  groupValue: selectedOption,
+                  onChanged: (value) {
+                    handleRadioChange(value!);
+                  },
+                ),
+                RadioListTile<String>(
+                  title: Text("من سن 12 الى 18 شهر"),
+                  value: '18',
+                  groupValue: selectedOption,
+                  onChanged: (value) {
+                    handleRadioChange(value!);
+                  },
+                ),
+                RadioListTile<String>(
+                  title: Text("من سن 18 الى 24 شهر"),
+                  value: '24',
+                  groupValue: selectedOption,
+                  onChanged: (value) {
+                    handleRadioChange(value!);
+                  },
+                ),
+                RadioListTile<String>(
+                  title: Text("من سن سنتين الى 3 سنوات"),
+                  value: '36',
+                  groupValue: selectedOption,
+                  onChanged: (value) {
+                    handleRadioChange(value!);
+                  },
+                ),
+                RadioListTile<String>(
+                  title: Text("من سن 3 الى 4 سنوات"),
+                  value: '48',
+                  groupValue: selectedOption,
+                  onChanged: (value) {
+                    handleRadioChange(value!);
+                  },
+                ),
+                RadioListTile<String>(
+                  title: Text("من سن 4 الى 5 سنوات"),
+                  value: '60',
+                  groupValue: selectedOption,
+                  onChanged: (value) {
+                    handleRadioChange(value!);
+                  },
+                ),
+                RadioListTile<String>(
+                  title: Text("من سن 5 الى 6 سنوات"),
+                  value: '72',
                   groupValue: selectedOption,
                   onChanged: (value) {
                     handleRadioChange(value!);
@@ -121,14 +171,14 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
             SizedBox(height: 8),
             ExpansionTile(
               initiallyExpanded: true,
-              title:
-                  Text("علامات النمو الحركية"), // Title of the foldable section
+              title: Text(context
+                  .tr("motor-milestones")), // Title of the foldable section
               leading: Image.asset(
                   "assets/motor-milestones.png"), // Optional leading icon
               children: followUp.motorMilestones.map((item) {
                 int index = followUp.motorMilestones.indexOf(item);
                 return CheckboxListTile(
-                  title: Text(item['label']),
+                  title: Text(context.tr(item['label'], fallback: "test")),
                   value: item['isChecked'],
                   onChanged: (bool? value) {
                     _handleCheckboxChange(
@@ -171,22 +221,25 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
                 );
               }).toList(),
             ),
-            ExpansionTile(
-              title: Text("نقاط التغذية"), // Title of the foldable section
-              leading: Image.asset(
-                  "assets/feeding-milestones.png"), // Optional leading icon
-              children: followUp.feedingMilestones.map((item) {
-                int index = followUp.feedingMilestones.indexOf(item);
-                return CheckboxListTile(
-                  title: Text(item['label']),
-                  value: item['isChecked'],
-                  onChanged: (bool? value) {
-                    _handleCheckboxChange(
-                        index, value, followUp.feedingMilestones);
-                  },
-                );
-              }).toList(),
-            ),
+            int.parse(selectedOption!) < 18
+                ? ExpansionTile(
+                    title:
+                        Text("نقاط التغذية"), // Title of the foldable section
+                    leading: Image.asset(
+                        "assets/feeding-milestones.png"), // Optional leading icon
+                    children: followUp.feedingMilestones.map((item) {
+                      int index = followUp.feedingMilestones.indexOf(item);
+                      return CheckboxListTile(
+                        title: Text(item['label']),
+                        value: item['isChecked'],
+                        onChanged: (bool? value) {
+                          _handleCheckboxChange(
+                              index, value, followUp.feedingMilestones);
+                        },
+                      );
+                    }).toList(),
+                  )
+                : SizedBox(),
             SizedBox(
               height: 12,
             ),
@@ -202,6 +255,7 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
                 loading = true;
               });
               try {
+                followUp.age = int.parse(selectedOption!);
                 // send the data to the server to analyze it
                 final values = followUp.generateValues();
                 print('going to get the user from the server');
@@ -209,10 +263,10 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
                   "baby_id": (await Auth.getCurrentUser(type: 'baby'))!['id'],
                   "follow_up_date":
                       DateTime.now().toLocal().toString().split(' ')[0],
-                  "motorMilestones": values[0],
-                  "feedingMilestones": values[1],
-                  "communicationMilestones": values[2],
-                  "sensoryMilestones": values[3],
+                  "motormilestones": values[0],
+                  "feedingmilestones": values[1],
+                  "communicationmilestones": values[2],
+                  "sensorymilestones": values[3],
                   // "score": (followUp.generateScore() * 100).floor(),
                   "healthy": followUp.healthy,
                   // "ageInMonths":
@@ -229,8 +283,10 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
                 setState(() {
                   loading = false;
                 });
-                Navigator.pushNamed(context, "followUpResult",
-                    arguments: data['healthy']);
+                if (context.mounted) {
+                  Navigator.pushNamed(context, "followUpResult",
+                      arguments: data['healthy']);
+                }
               } catch (e) {
                 print(e);
               }
@@ -238,7 +294,7 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
             SizedBox(height: 8),
             loading
                 ? Center(
-                    child: Container(
+                    child: SizedBox(
                         width: 40,
                         child: CircularProgressIndicator(
                           color: clr(1),

@@ -4,7 +4,7 @@ import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
 
 class BabySetup extends StatefulWidget {
-  BabySetup({super.key});
+  const BabySetup({super.key});
 
   @override
   State<BabySetup> createState() => _BabySetupState();
@@ -28,7 +28,7 @@ class _BabySetupState extends State<BabySetup> {
     try {
       final userData = {
         "name": babyNameController.text,
-        "email": await Auth.getCurrentUserEmail(),
+        "email": Auth.getCurrentUserEmail(),
         "phone": phoneController.text,
         "role": "baby"
       };

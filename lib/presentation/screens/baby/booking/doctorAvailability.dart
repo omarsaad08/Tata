@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:tata/data/auth.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'dart:math';
 import 'package:tata/presentation/components/theme.dart';
 
 class DoctorAvailabilityScreen extends StatefulWidget {
   final int doctorId;
-  const DoctorAvailabilityScreen({Key? key, required this.doctorId})
-      : super(key: key);
+  const DoctorAvailabilityScreen({super.key, required this.doctorId});
 
   @override
   _DoctorAvailabilityScreenState createState() =>
@@ -46,13 +46,6 @@ class _DoctorAvailabilityScreenState extends State<DoctorAvailabilityScreen> {
           .select('available_days, start_time, end_time')
           .eq('doctor_id', widget.doctorId)
           .single();
-
-      if (response == null) {
-        setState(() {
-          isLoading = false;
-        });
-        return;
-      }
 
       List<int> days = List<int>.from(response['available_days']);
       String startTimeStr = response['start_time'];
@@ -100,11 +93,16 @@ class _DoctorAvailabilityScreenState extends State<DoctorAvailabilityScreen> {
       return;
     }
 
+    setState(() {
+      isLoading = true;
+    });
     // Convert Arabic time format back to 24-hour format (HH:mm)
     DateTime parsedTime =
         DateFormat('hh:mm a', 'ar').parse(availableTimes[selectedTimeIndex]);
     String formattedTime = DateFormat('HH:mm').format(parsedTime);
+    final babyId = (await Auth.getCurrentUser(type: "baby"))!['id'];
     final bookingData = {
+      "baby_id": babyId,
       "doctor_id": widget.doctorId,
       "date": DateFormat('yyyy-MM-dd').format(selectedDate!),
       "time": formattedTime,
@@ -119,7 +117,11 @@ class _DoctorAvailabilityScreenState extends State<DoctorAvailabilityScreen> {
         .insert(bookingData)
         .select()
         .single();
-    if (response['appointment_id'] != null) {
+    print("response: $response");
+    setState(() {
+      isLoading = false;
+    });
+    if (response['id'] != null) {
       setState(() {
         message = "تم طلب حجز الجلسة بنجاح. سنخبركم عندما يوافق الطبيب عليها";
       });

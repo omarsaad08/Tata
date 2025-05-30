@@ -4,9 +4,9 @@ import 'package:tata/data/auth.dart';
 
 String generateRandomString(int len) {
   var r = Random();
-  const _chars =
+  const chars =
       'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
-  return List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
+  return List.generate(len, (index) => chars[r.nextInt(chars.length)]).join();
 }
 
 class BookingServices {
@@ -41,21 +41,28 @@ class BookingServices {
     }
   }
 
-  static Future<int?> updateAppointment(int appointment_id, Map data) async {
+  static Future<int?> updateAppointment(int appointmentId, Map data) async {
+    return null;
+  
     // to be made
   }
 
   static Future<List?> getRequestedAppointments() async {
+    return null;
+  
     // to be made
   }
 
-  static Future<List?> fetchPreviousBookingsForBaby() async {}
+  static Future<List?> fetchPreviousBookingsForBaby() async {
+    return null;
+  }
 
   static Future<Map?> bookADoctor(Map<String, dynamic> data) async {
     try {
       data.addAll({"roomid": generateRandomString(20)});
       final booking =
           await supabase.from("appointments").insert(data).select("*").single();
+      return booking;
     } catch (e) {
       print("could not book this session: $e");
       return null;

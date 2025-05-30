@@ -4,9 +4,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tata/data/auth.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
+import 'package:tata/extensions/translation_extension.dart';
 
 class AvailabilityInput extends StatefulWidget {
-  const AvailabilityInput({Key? key}) : super(key: key);
+  const AvailabilityInput({super.key});
 
   @override
   _AvailabilityInputState createState() => _AvailabilityInputState();
@@ -25,8 +26,10 @@ class _AvailabilityInputState extends State<AvailabilityInput> {
   ];
 
   List<int> selectedDays = [];
-  TimeOfDay? startTime;
-  TimeOfDay? endTime;
+  TextEditingController startTimeController = TextEditingController();
+  TextEditingController endTimeController = TextEditingController();
+  String startAmPm = 'ص'; // Default AM/PM for start time (ص = AM)
+  String endAmPm = 'ص'; // Default AM/PM for end time (ص = AM)
 
   void toggleDaySelection(int index) {
     setState(() {
@@ -36,42 +39,68 @@ class _AvailabilityInputState extends State<AvailabilityInput> {
     });
   }
 
-  Future<void> pickTime(bool isStartTime) async {
-    TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: isStartTime
-          ? startTime ?? TimeOfDay(hour: 9, minute: 0)
-          : endTime ?? TimeOfDay(hour: 17, minute: 0),
-    );
+  bool validateTimeFormat(String time) {
+    // Validate 12-hour time format (hh:mm)
+    final RegExp timeRegex = RegExp(r'^(0?[1-9]|1[0-2]):[0-5][0-9]$');
+    return timeRegex.hasMatch(time);
+  }
 
-    if (picked != null) {
-      setState(() {
-        if (isStartTime) {
-          startTime = picked;
-        } else {
-          endTime = picked;
-        }
-      });
-    }
+  String convertTo24HourFormat(String time, String amPm) {
+    // Convert 12-hour time to 24-hour format
+    final format = DateFormat('hh:mm a');
+    final dateTime = format.parse('$time ${amPm == 'ص' ? 'AM' : 'PM'}');
+    return DateFormat('HH:mm').format(dateTime);
   }
 
   void saveAvailability() async {
-    if (selectedDays.isEmpty || startTime == null || endTime == null) {
+    // Validate selected days
+    if (selectedDays.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-                "يرجى تحديد الأيام وساعات العمل")), // "Please select days and working hours"
+        SnackBar(content: Text("يرجى تحديد الأيام المتاحة")),
       );
       return;
     }
+
+    // Validate start time
+    if (startTimeController.text.isEmpty ||
+        !validateTimeFormat(startTimeController.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("يرجى إدخال وقت بداية صحيح (hh:mm)")),
+      );
+      return;
+    }
+
+    // Validate end time
+    if (endTimeController.text.isEmpty ||
+        !validateTimeFormat(endTimeController.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("يرجى إدخال وقت نهاية صحيح (hh:mm)")),
+      );
+      return;
+    }
+
+    // Convert 12-hour time to 24-hour format
+    final startTime24 =
+        convertTo24HourFormat(startTimeController.text, startAmPm);
+    final endTime24 = convertTo24HourFormat(endTimeController.text, endAmPm);
+
+    // Ensure end time is after start time
+    final start = DateFormat('HH:mm').parse(startTime24);
+    final end = DateFormat('HH:mm').parse(endTime24);
+    if (end.isBefore(start)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("وقت النهاية يجب أن يكون بعد وقت البداية")),
+      );
+      return;
+    }
+
+    // Save availability
     final doctor = await Auth.getCurrentUser(type: "doctor");
     final availabilityData = {
       "doctor_id": doctor!['id'],
       "available_days": selectedDays,
-      "start_time":
-          "${startTime!.hour}:${startTime!.minute.toString().padLeft(2, '0')}",
-      "end_time":
-          "${endTime!.hour}:${endTime!.minute.toString().padLeft(2, '0')}"
+      "start_time": startTime24,
+      "end_time": endTime24,
     };
 
     final response = await supabase
@@ -80,30 +109,47 @@ class _AvailabilityInputState extends State<AvailabilityInput> {
         .select()
         .single();
     if (response['id'] != null) {
-      Navigator.pushReplacementNamed(context, "doctorHome");
+      Navigator.pushReplacementNamed(context, "uploadImage");
     }
   }
 
-  Widget buildTimePickerTile(String title, TimeOfDay? time, bool isStartTime) {
-    return GestureDetector(
-      onTap: () => pickTime(isStartTime),
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-        decoration: BoxDecoration(
-          color: clr(1), // Background color
-          borderRadius: BorderRadius.circular(30), // Circular shape
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              "$title: ${time != null ? time.format(context) : 'اختر وقتًا'}",
-              style: TextStyle(color: Colors.white, fontSize: 16),
+  Widget buildTimeInputRow(String label, TextEditingController controller,
+      String amPm, Function(String) onAmPmChanged) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 2,
+          child: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              labelText: label,
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.access_time),
             ),
-            Icon(Icons.access_time, color: Colors.white),
-          ],
+            keyboardType: TextInputType.datetime,
+          ),
         ),
-      ),
+        SizedBox(width: 10),
+        Expanded(
+          flex: 1,
+          child: Row(
+            children: [
+              Radio<String>(
+                value: 'ص',
+                groupValue: amPm,
+                onChanged: (value) => onAmPmChanged(value!),
+              ),
+              Text(context.tr("am")), // AM in Arabic
+              Radio<String>(
+                value: 'م',
+                groupValue: amPm,
+                onChanged: (value) => onAmPmChanged(value!),
+              ),
+              Text(context.tr("pm")), // PM in Arabic
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -111,7 +157,8 @@ class _AvailabilityInputState extends State<AvailabilityInput> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('إعدادات المواعيد', style: TextStyle(color: Colors.white)),
+        title: Text(context.tr("time-settings"),
+            style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: clr(1),
       ),
@@ -120,7 +167,7 @@ class _AvailabilityInputState extends State<AvailabilityInput> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text("اختر الأيام المتاحة",
+            Text(context.tr("choose-available-days"),
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             SizedBox(height: 10),
             Wrap(
@@ -140,13 +187,25 @@ class _AvailabilityInputState extends State<AvailabilityInput> {
               }),
             ),
             SizedBox(height: 20),
-            buildTimePickerTile("وقت البداية", startTime, true),
+            buildTimeInputRow(
+              "${context.tr("start-time")} (12:00)",
+              startTimeController,
+              startAmPm,
+              (value) => setState(() => startAmPm = value),
+            ),
             SizedBox(height: 10),
-            buildTimePickerTile("وقت النهاية", endTime, false),
+            buildTimeInputRow(
+              "${context.tr("end-time")} (12:00)",
+              endTimeController,
+              endAmPm,
+              (value) => setState(() => endAmPm = value),
+            ),
             SizedBox(height: 20),
             Row(
               children: [
-                Expanded(child: mainElevatedButton("حفظ", saveAvailability))
+                Expanded(
+                    child: mainElevatedButton(
+                        context.tr("done"), saveAvailability))
               ],
             ),
           ],

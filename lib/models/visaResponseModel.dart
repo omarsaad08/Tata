@@ -6,12 +6,12 @@ class VisaResponseModel {
 
   VisaResponseModel.fromJson(Map<String, dynamic> json) {
     status = json['status'];
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    data = json['data'] != null ? Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['status'] = status;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -30,16 +30,16 @@ class Data {
     invoiceId = json['invoice_id'];
     invoiceKey = json['invoice_key'];
     paymentData = json['payment_data'] != null
-        ? new PaymentData.fromJson(json['payment_data'])
+        ? PaymentData.fromJson(json['payment_data'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['invoice_id'] = this.invoiceId;
-    data['invoice_key'] = this.invoiceKey;
-    if (this.paymentData != null) {
-      data['payment_data'] = this.paymentData!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['invoice_id'] = invoiceId;
+    data['invoice_key'] = invoiceKey;
+    if (paymentData != null) {
+      data['payment_data'] = paymentData!.toJson();
     }
     return data;
   }
@@ -55,8 +55,8 @@ class PaymentData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['redirectTo'] = this.redirectTo;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['redirectTo'] = redirectTo;
     return data;
   }
 }

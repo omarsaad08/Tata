@@ -15,7 +15,7 @@ class _SignupState extends State<Signup> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool isPasswordVisible = false;
-  String? errorMessage = null;
+  String? errorMessage;
   bool loading = false;
 
   Future signUp() async {
@@ -24,6 +24,30 @@ class _SignupState extends State<Signup> {
         loading = true;
       });
       try {
+        final doesUserExist = await Auth.doesUserExist(emailController.text);
+        if (doesUserExist) {
+          final doesDoctorExist =
+              await Auth.doesUserExist(emailController.text, type: "doctor");
+          final doesBabyExist =
+              await Auth.doesUserExist(emailController.text, type: "baby");
+          if (doesDoctorExist || doesBabyExist) {
+            throw Exception("هذا الحساب مسجل بالفعل");
+          } else {
+            final user = await Auth.signIn(
+                emailController.text, passwordController.text);
+            if (user != null) {
+              Navigator.pushReplacementNamed(context, "userSetup");
+              setState(() {
+                loading = false;
+              });
+            } else {
+              setState(() {
+                errorMessage = "هذا الحساب مسجل بالفعل لكن كلمة المرور خطأ";
+                loading = false;
+              });
+            }
+          }
+        }
         final authResponse =
             await Auth.signUp(emailController.text, passwordController.text);
         if (authResponse.runtimeType == AuthException) {

@@ -1,6 +1,7 @@
-import 'package:dio/dio.dart';
+import 'package:agora_token_service/agora_token_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tata/data/auth.dart';
 import 'package:tata/logic/video_utils.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
@@ -8,7 +9,7 @@ import 'package:tata/presentation/screens/video/video_call_page.dart';
 
 class NextAppointmentDoctor extends StatefulWidget {
   final Map appointment;
-  NextAppointmentDoctor({super.key, required this.appointment});
+  const NextAppointmentDoctor({super.key, required this.appointment});
 
   @override
   State<NextAppointmentDoctor> createState() => NextAppointmentDoctorState();
@@ -17,6 +18,7 @@ class NextAppointmentDoctor extends StatefulWidget {
 class NextAppointmentDoctorState extends State<NextAppointmentDoctor> {
   @override
   Widget build(BuildContext context) {
+    print('appointment_data: ${widget.appointment}');
     return Scaffold(
         appBar: AppBar(
             title: Text("الحجز القادم", style: TextStyle(color: clr(0))),
@@ -30,41 +32,35 @@ class NextAppointmentDoctorState extends State<NextAppointmentDoctor> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("الدكتور"),
-                    Text(widget.appointment['name'] != null
-                        ? widget.appointment['name']
-                        : "محمد محمد"),
+                    Text(widget.appointment['name'] ?? "محمد محمد"),
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('المكان'),
-                    Text(widget.appointment['place'] != null
-                        ? widget.appointment['place']
-                        : "اونلاين"),
+                    Text(widget.appointment['place'] ?? "اونلاين"),
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("اليوم"),
-                    Text(widget.appointment['appointment_date'].split('T')[0]),
+                    Text(widget.appointment['date'].split('T')[0]),
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("التوقيت"),
-                    Text(widget.appointment['appointment_time']),
+                    Text(widget.appointment['time']),
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text("نوع الحجز"),
-                    Text(widget.appointment['type'] != null
-                        ? widget.appointment['type']
-                        : "كشف"),
+                    Text(widget.appointment['type'] ?? "كشف"),
                   ],
                 ),
                 Row(
@@ -75,20 +71,33 @@ class NextAppointmentDoctorState extends State<NextAppointmentDoctor> {
                             await handlePermissionsForCall(context);
 
                         if (isPermissionGranted) {
-                          final dio = Dio();
-                          final response = await dio.get(
-                              'http://192.168.1.219:3000/appointments/token',
-                              data: {
-                                "uid": widget.appointment['doctor_id'],
-                                "channelName": widget.appointment['roomid']
-                              });
-                          final token = response.data['token'];
+                          const appId = "d3cd34df63c14ee0853c1063429148ae";
+                          const appCertificate =
+                              "701256341e5847a68266d640744dd945";
+                          final String channelName =
+                              widget.appointment['roomid'];
+                          final int uid = (await Auth.getCurrentUser())!['id'];
+
+                          // Generate RTC token
+                          final token = RtcTokenBuilder.build(
+                            appId: appId.toString(),
+                            appCertificate: appCertificate.toString(),
+                            channelName: channelName.toString(),
+                            uid: uid.toString(),
+                            role:
+                                RtcRole.publisher, // Use 'subscriber' if needed
+                            expireTimestamp:
+                                DateTime.now().millisecondsSinceEpoch ~/ 1000 +
+                                    3600, // Expires in 1 hour
+                          );
+                          print(
+                              "token: $token, uid: $uid, channel: $channelName");
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => VideoCallScreen(
-                                  channelName: widget.appointment['roomid'],
-                                  uid: widget.appointment['doctor_id'],
+                                  channelName: channelName,
+                                  uid: uid,
                                   token: token),
                             ),
                           );
@@ -107,16 +116,16 @@ class NextAppointmentDoctorState extends State<NextAppointmentDoctor> {
                     ),
                   ],
                 ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: mainElevatedButton("انهاء", () {
-                        Navigator.pushNamed(context, 'finishAppointment',
-                            arguments: widget.appointment);
-                      }, color: clr(2)),
-                    ),
-                  ],
-                ),
+                // Row(
+                //   children: [
+                //     Expanded(
+                //       child: mainElevatedButton("انهاء", () {
+                //         Navigator.pushNamed(context, 'finishAppointment',
+                //             arguments: widget.appointment);
+                //       }, color: clr(2)),
+                //     ),
+                //   ],
+                // ),
                 SizedBox(
                   width: 8,
                 ),

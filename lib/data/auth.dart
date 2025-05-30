@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:dio/dio.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:tata/data/notificationHandler.dart';
+// import 'package:tata/data/notificationHandler.dart';
 
 class Auth {
   static final supabase = Supabase.instance.client;
@@ -23,7 +23,6 @@ class Auth {
       final user = await Supabase.instance.client.auth
           .signInWithPassword(email: email, password: password);
       print("response: $user");
-      await NotificationHandler.saveDoctorToken();
       return user;
     } on AuthException catch (e) {
       print("Authentication Error: ${e.message}");
@@ -39,7 +38,7 @@ class Auth {
   }
 
   static Future<Map?> getCurrentUser({String type = "user"}) async {
-    final email = await getCurrentUserEmail();
+    final email = getCurrentUserEmail();
     if (email == null) return null;
     try {
       if (type == "user") {
@@ -59,6 +58,7 @@ class Auth {
     } catch (e) {
       print("error getting user: $e");
     }
+    return null;
   }
 
   static Future<Map?> saveUser(Map data, {String type = "users"}) async {
@@ -67,10 +67,41 @@ class Auth {
     } catch (e) {
       print('error saving user: $e');
     }
+    return null;
   }
 
   static String? getCurrentUserEmail() {
     return supabase.auth.currentUser?.email;
+  }
+
+  static Future<bool> doesUserExist(String email,
+      {String type = "users"}) async {
+    try {
+      // Step 1: Find the user by email in the `users` table
+      final userResult = await supabase
+          .from('users')
+          .select('*')
+          .eq('email', email)
+          .maybeSingle();
+
+      if (userResult == null) return false;
+
+      // Step 2: If checking for "users" type, return true since user exists
+      if (type == "users") return true;
+
+      // Step 3: Check if the user has a related entry in either "doctors" or "babies"
+      final userId = userResult['id'];
+      final subUser = await supabase
+          .from(type)
+          .select('*')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+      return subUser != null;
+    } catch (e) {
+      print('Error checking if user exists: $e');
+      return false;
+    }
   }
 
   static Future resetPassword() async {}

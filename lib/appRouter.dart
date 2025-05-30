@@ -13,10 +13,11 @@ import 'package:tata/presentation/screens/baby/booking/doctorAvailability.dart';
 import 'package:tata/presentation/screens/baby/booking/payment/bookingPayment.dart';
 import 'package:tata/presentation/screens/baby/booking/payment/paymentResult.dart';
 import 'package:tata/presentation/screens/baby/booking/payment/paymentWebView.dart';
+import 'package:tata/presentation/screens/baby/follow_up/followUpHistoryDetails.dart';
 import 'package:tata/presentation/screens/baby/follow_up/followUpResult.dart';
 import 'package:tata/presentation/screens/baby/follow_up/warningSigns.dart';
 import 'package:tata/presentation/screens/baby/nextAppointment/finishAppointment.dart';
-import 'package:tata/presentation/screens/baby/nextAppointment/nextAppointment.dart';
+import 'package:tata/presentation/screens/baby/nextAppointment/nextAppointmentBaby.dart';
 import 'package:tata/presentation/screens/baby/booking/doctorBooking.dart';
 import 'package:tata/presentation/screens/baby/booking/payment.dart';
 import 'package:tata/presentation/screens/baby/follow_up/periodicFollowUp.dart';
@@ -24,12 +25,14 @@ import 'package:tata/presentation/screens/baby/previousBookingsDetails/previousB
 import 'package:tata/presentation/screens/baby/previousBookingsDetails/previousBookingsDetails.dart';
 // import 'package:tata/presentation/screens/baby/videoCallPage.dart';
 import 'package:tata/presentation/screens/auth/availabilityInput.dart';
+import 'package:tata/presentation/screens/doctor/appointments/enterAppointment.dart';
 import 'package:tata/presentation/screens/doctor/doctorHome.dart';
 import 'package:tata/presentation/screens/doctor/doctorPreviousBookings.dart';
 import 'package:tata/presentation/screens/doctor/doctorUpcomingBookings.dart';
 import 'package:tata/presentation/screens/doctor/nextAppointmentDoctor.dart';
 import 'package:tata/presentation/screens/doctor/notifications.dart';
 import 'package:tata/presentation/screens/doctor/offlineBook.dart';
+import 'package:tata/presentation/screens/auth/forgotPassword.dart';
 import 'package:tata/presentation/screens/doctor/settings/settings.dart';
 
 class AppRouter {
@@ -130,6 +133,21 @@ class AppRouter {
             builder: (context) => PaymentResult(result: result));
       case 'uploadImage':
         return MaterialPageRoute(builder: (context) => UploadImageScreen());
+      case 'followUpHistoryDetails':
+        final data = settings.arguments as Map;
+        return MaterialPageRoute(
+            builder: (context) => FollowUpHistoryDetails(followUp: data));
+      case 'enterAppointment':
+        final appointment = settings.arguments as Map;
+        return MaterialPageRoute(
+            builder: (context) => EnterAppointment(
+                  appointment: appointment,
+                ));
+      case 'forgotPassword':
+        return MaterialPageRoute(
+          builder: (context) => ForgotPassword(),
+        );
     }
+    return null;
   }
 }

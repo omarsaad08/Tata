@@ -9,14 +9,14 @@ class PaymentMethod {
     if (json['data'] != null) {
       data = <Data>[];
       json['data'].forEach((v) {
-        data!.add(new Data.fromJson(v));
+        data!.add(Data.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['status'] = this.status;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['status'] = status;
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
@@ -42,12 +42,12 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['paymentId'] = this.paymentId;
-    data['name_en'] = this.nameEn;
-    data['name_ar'] = this.nameAr;
-    data['redirect'] = this.redirect;
-    data['logo'] = this.logo;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['paymentId'] = paymentId;
+    data['name_en'] = nameEn;
+    data['name_ar'] = nameAr;
+    data['redirect'] = redirect;
+    data['logo'] = logo;
     return data;
   }
 }

@@ -13,7 +13,8 @@ class FollowUp {
   int sensoryCounter = 0;
   bool healthy = true;
   int counter = 0;
-  FollowUp(int age) {
+  int age = 0;
+  FollowUp(this.age) {
     setup(age);
   }
   void setup(int age) {
@@ -322,6 +323,143 @@ class FollowUp {
           {"label": "يتناول الطعام بأصابعه بنفسه", "isChecked": false},
         ];
         break;
+      case 18:
+        motorMilestones = [
+          {"label": "يمشي بدون دعم", "isChecked": false},
+          {"label": "يحاول صعود السلم مستندًا", "isChecked": false},
+          {"label": "يدفع أو يسحب ألعاب", "isChecked": false},
+          {"label": "يبدأ في الجري بخطوات غير متزنة", "isChecked": false},
+        ];
+        sensoryMilestones = [
+          {"label": "يستجيب للأصوات المألوفة", "isChecked": false},
+          {"label": "يلتفت عند مناداته", "isChecked": false},
+          {"label": "يلمس الأشياء ويستكشفها بفمه", "isChecked": false},
+          {"label": "يُظهر تفاعلًا مع الموسيقى", "isChecked": false},
+        ];
+        communicationMilestones = [
+          {"label": "ينطق أولى كلماته (زي بابا، ماما)", "isChecked": false},
+          {"label": "يشير لطلب شيء", "isChecked": false},
+          {"label": "يستخدم الإشارات (زي التلويح)", "isChecked": false},
+          {
+            "label": "يستخدم الإبهام والسبابة لالتقاط الأشياء الصغيرة",
+            "isChecked": false
+          },
+        ];
+        feedingMilestones = [
+          {
+            "label": "يزحف نحو أو بعيدًا عن الأشياء التي يراها من مسافة",
+            "isChecked": false
+          },
+          {"label": "يستمتع بالاستماع إلى الأغاني", "isChecked": false},
+          {"label": "يستكشف الألعاب بأصابعه وفمه", "isChecked": false},
+        ];
+        break;
+      case 24:
+        motorMilestones = [
+          {"label": "يجري بثبات أكبر", "isChecked": false},
+          {"label": "يصعد السلم بمساعدة", "isChecked": false},
+          {"label": "يبدأ في القفز في مكانه", "isChecked": false},
+          {"label": "يحمل أشياء أثناء المشي", "isChecked": false},
+        ];
+        sensoryMilestones = [
+          {"label": "يستمتع بالموسيقى", "isChecked": false},
+          {"label": "يتبع الأشياء بعينيه بدقة", "isChecked": false},
+          {"label": "يُظهر تفضيلًا لألعاب معينة", "isChecked": false},
+          {"label": "يلاحظ الأصوات المختلفة", "isChecked": false},
+        ];
+        communicationMilestones = [
+          {"label": "يستخدم من 10 لـ 20 كلمة", "isChecked": false},
+          {"label": "يبدأ تكوين جمل بسيطة من كلمتين", "isChecked": false},
+          {"label": "يقلد كلمات جديدة", "isChecked": false},
+          {"label": "يفهم أوامر مكونة من خطوتين", "isChecked": false},
+        ];
+        break;
+      case 36:
+        motorMilestones = [
+          {"label": "يجري بسهولة", "isChecked": false},
+          {"label": "يقفز بكلتا القدمين", "isChecked": false},
+          {"label": "يصعد السلم خطوة بخطوة", "isChecked": false},
+          {"label": "يركب الدراجة ذات الثلاث عجلات", "isChecked": false},
+        ];
+        sensoryMilestones = [
+          {"label": "يميز بين الأصوات", "isChecked": false},
+          {"label": "يختار لعبته المفضلة", "isChecked": false},
+          {"label": "يستجيب لاسمه باستمرار", "isChecked": false},
+          {"label": "يُظهر اهتمامًا بالتفاصيل", "isChecked": false},
+        ];
+        communicationMilestones = [
+          {"label": "يقول جمل من كلمتين إلى ثلاث", "isChecked": false},
+          {"label": "يسمي أعضاء الجسم", "isChecked": false},
+          {"label": "يسأل “دي إيه؟” أو “فين؟”", "isChecked": false},
+          {"label": "يعرف أسماء الأشخاص المقربين", "isChecked": false},
+        ];
+        break;
+      case 48:
+        motorMilestones = [
+          {"label": "يقفز على قدم واحدة", "isChecked": false},
+          {"label": "يرمي ويمسك الكرة", "isChecked": false},
+          {"label": "يغير الاتجاه أثناء الجري", "isChecked": false},
+          {"label": "يتسلق بسهولة", "isChecked": false},
+        ];
+        sensoryMilestones = [
+          {"label": "يلاحظ تفاصيل الصور", "isChecked": false},
+          {"label": "يقلد الحركات اللي يشوفها", "isChecked": false},
+          {"label": "يتحمّل الأصوات العالية لفترة أطول", "isChecked": false},
+          {"label": "يتعرف على اختلاف الملامس", "isChecked": false},
+        ];
+        communicationMilestones = [
+          {"label": "يستخدم جمل من 3–5 كلمات", "isChecked": false},
+          {"label": "يحكي عن موقف بسيط حصل له", "isChecked": false},
+          {"label": "يسأل أسئلة زي “ليه؟”", "isChecked": false},
+          {"label": "يبدأ يستخدم الضمائر بشكل صحيح", "isChecked": false},
+        ];
+        break;
+      case 60:
+        motorMilestones = [
+          {"label": "يقفز من ارتفاع بسيط", "isChecked": false},
+          {"label": "يمسك الكرة بدقة", "isChecked": false},
+          {"label": "يركب دراجة بعجلتين بمساعدة", "isChecked": false},
+          {"label": "يستخدم أدوات بسيطة في اللعب", "isChecked": false},
+        ];
+        sensoryMilestones = [
+          {"label": "يفرّق بين الملامس المختلفة", "isChecked": false},
+          {"label": "يُظهر انزعاجه من أصوات أو ملمس معين", "isChecked": false},
+          {"label": "يبدأ يعبّر عن تفضيلاته الحسية", "isChecked": false},
+          {"label": "يتفاعل مع الأصوات بشكل أكثر دقة", "isChecked": false},
+        ];
+        communicationMilestones = [
+          {"label": "يحكي قصة قصيرة", "isChecked": false},
+          {"label": "يستخدم زمن الماضي", "isChecked": false},
+          {"label": "يسأل “إزاي؟” و”ليه؟” بشكل متكرر", "isChecked": false},
+          {"label": "يشرح أفكاره بجمل طويلة", "isChecked": false},
+        ];
+        break;
+      case 72:
+        motorMilestones = [
+          {"label": "يتحرك بثقة ورشاقة", "isChecked": false},
+          {"label": "يركب الدراجة بدون مساعدات", "isChecked": false},
+          {
+            "label": "يلعب ألعاب تعتمد على التوازن (زي الحبل)",
+            "isChecked": false
+          },
+          {"label": "يتحكم في جسمه بدقة اثناء اللعب", "isChecked": false},
+        ];
+        sensoryMilestones = [
+          {"label": "يتحمل المحفزات الحسية بشكل افضل", "isChecked": false},
+          {
+            "label": "يعبّر عن انزعاجه من الاصوات او الروائح",
+            "isChecked": false
+          },
+          {"label": "يختار الألعاب حسب تفضيلاته الحسية", "isChecked": false},
+          {"label": "يميز بين الاصوات بدقة", "isChecked": false},
+        ];
+        communicationMilestones = [
+          {"label": "يتحدث بجمل واضحة ومنظمة", "isChecked": false},
+          {"label": "يستخدم القواعد اللغوية بشكل صحيح", "isChecked": false},
+          {"label": "يصف الصور والمواقف بالتفصيل", "isChecked": false},
+          {"label": "يشارك في حوارات مع الكبار", "isChecked": false},
+        ];
+        break;
       default:
     }
   }
@@ -351,11 +489,18 @@ class FollowUp {
       sensoryValues.add(milestone['isChecked']);
       milestone['isChecked'] ? null : sensoryCounter++;
     }
-    if (motorCounter > 2 ||
-        feedingCounter > 1 ||
-        communicationCounter > 1 ||
-        sensoryCounter > 1) {
-      healthy = false;
+    print("age: $age");
+    if (age >= 18) {
+      if (motorCounter > 2 || communicationCounter > 1 || sensoryCounter > 1) {
+        healthy = false;
+      }
+    } else {
+      if (motorCounter > 2 ||
+          feedingCounter > 1 ||
+          communicationCounter > 1 ||
+          sensoryCounter > 1) {
+        healthy = false;
+      }
     }
     // print([motorCounter, feedingCounter, communicationCounter, sensoryCounter]);
     return [motorValues, feedingValues, communicationValues, sensoryValues];

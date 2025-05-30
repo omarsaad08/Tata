@@ -9,9 +9,13 @@ Color clr(int colorNum) {
     case 2:
       return Color(0xffed87ab);
     case 3:
-      return Color.fromARGB(255, 197, 228, 233);
+      return Color(0xffDEF3F7);
     case 4:
-      return Color.fromARGB(255, 19, 53, 60);
+      return Color(0xffFFEBF1);
+    case 5:
+      return Color(0xffF6F6F6);
+    case 6:
+      return Color(0xff272838);
   }
   return Colors.black;
 }

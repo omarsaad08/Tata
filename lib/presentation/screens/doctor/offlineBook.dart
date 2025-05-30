@@ -4,7 +4,7 @@ import 'package:tata/presentation/components/theme.dart';
 
 class OfflineBook extends StatefulWidget {
   final Map bookData;
-  OfflineBook({super.key, required this.bookData});
+  const OfflineBook({super.key, required this.bookData});
 
   @override
   State<OfflineBook> createState() => _OfflineBookState();

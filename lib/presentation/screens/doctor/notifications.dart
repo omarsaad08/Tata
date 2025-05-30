@@ -32,6 +32,7 @@ class _DoctorNotificationsState extends State<DoctorNotifications> {
   }
 
   Future<void> updateAppointmentStatus(int appointmentId, String status) async {
+    print("appointment id: $appointmentId");
     final response = await supabase
         .from('appointments')
         .update({'status': status}).eq('id', appointmentId);
@@ -44,6 +45,7 @@ class _DoctorNotificationsState extends State<DoctorNotifications> {
     }
   }
 
+  @override
   void initState() {
     super.initState();
     final id = fetchPendingAppointments();
@@ -78,6 +80,7 @@ class _DoctorNotificationsState extends State<DoctorNotifications> {
               itemCount: appointments.length,
               itemBuilder: (context, index) {
                 final appointment = appointments[index];
+                print("appointment id: ${appointment['id']}");
                 return Card(
                   child: ListTile(
                     title: Text("طلب موعد"),

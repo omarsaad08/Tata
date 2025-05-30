@@ -7,9 +7,9 @@ import 'package:flutter/material.dart';
 class BookingPaymentServices {
   static PaymentMethod? paymentMethod;
   static VisaResponseModel? visaResponseModel;
-  static final accessToken =
+  static const accessToken =
       'd83a5d07aaeb8442dcbe259e6dae80a3f2e21a3a581e1a5acd';
-  static final baseUrl = 'http://192.168.1.219:3000';
+  static const baseUrl = 'http://192.168.1.219:3000';
   static final dio = Dio(BaseOptions(headers: {
     'Content-Type': 'application/json',
     'Authorization': 'Bearer $accessToken'
@@ -17,7 +17,7 @@ class BookingPaymentServices {
 
   static Future<void> getPaymentMethod() async {
     dio.interceptors.add(PrettyDioLogger());
-    final apiUrl = 'https://staging.fawaterk.com/api/v2/getPaymentmethods';
+    const apiUrl = 'https://staging.fawaterk.com/api/v2/getPaymentmethods';
     try {
       Response response = await dio.get(apiUrl);
       paymentMethod = PaymentMethod.fromJson(response.data);

@@ -1,67 +1,90 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:tata/data/auth.dart';
-import 'package:tata/data/notificationHandler.dart';
-import 'package:tata/presentation/components/theme.dart';
-import 'package:tata/appRouter.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
+import 'package:tata/app_localizations.dart';
+import 'package:tata/appRouter.dart';
+import 'package:tata/data/auth.dart';
+import 'package:tata/firebase_options.dart';
+import 'package:tata/logic/bloc/language_bloc.dart';
+import 'package:tata/presentation/components/theme.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 
-late String route;
+late String initialRoute;
 void main() async {
+  usePathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  await Supabase.initialize(
-      url: "https://dnndzkbrszfuhhtvppuj.supabase.co",
-      anonKey:
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRubmR6a2Jyc3pmdWhodHZwcHVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkwOTQ5NDQsImV4cCI6MjA1NDY3MDk0NH0.divvhyL00ZFImM2GcuOrzl5yp3uuWoOGaYJo0gyoemY");
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
+  // Initialize Supabase
+  await Supabase.initialize(
+    url: "https://dnndzkbrszfuhhtvppuj.supabase.co",
+    anonKey:
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRubmR6a2Jyc3pmdWhodHZwcHVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkwOTQ5NDQsImV4cCI6MjA1NDY3MDk0NH0.divvhyL00ZFImM2GcuOrzl5yp3uuWoOGaYJo0gyoemY",
+  );
+  // Determine initial route
   final user = await Auth.getCurrentUser();
   if (user != null) {
-    await NotificationHandler.saveDoctorToken();
-    route = '${user['role']}Home';
+    initialRoute = '${user['role']}Home';
   } else {
-    route = 'login';
+    initialRoute = 'login';
   }
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  runApp(MainApp(
-    appRouter: AppRouter(),
-  ));
+
+  runApp(MainApp(appRouter: AppRouter()));
 }
 
 class MainApp extends StatelessWidget {
   final AppRouter appRouter;
   const MainApp({super.key, required this.appRouter});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-          fontFamily: "Rubik",
-          colorScheme: ColorScheme.light(
-            primary: clr(1),
-          )),
-      initialRoute: route,
-      onGenerateRoute: appRouter.generateRoute,
-      localizationsDelegates: [
-        GlobalCupertinoLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => LanguageBloc()..add(InitializeLanguageEvent()),
+        ),
       ],
-      supportedLocales: [
-        Locale("ar", "AE"),
-      ],
-      locale: Locale("ar", "AE"),
+      child: AppView(appRouter: appRouter),
     );
   }
 }
 
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print("Handling a background message: ${message.messageId}");
+class AppView extends StatefulWidget {
+  final AppRouter appRouter;
+  const AppView({super.key, required this.appRouter});
+
+  @override
+  State<AppView> createState() => _AppViewState();
 }
+
+class _AppViewState extends State<AppView> {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<LanguageBloc, LanguageState>(
+      builder: (context, state) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            fontFamily: "NotoSansArabic",
+            colorScheme: ColorScheme.light(primary: clr(1)),
+          ),
+          initialRoute: initialRoute,
+          onGenerateRoute: widget.appRouter.generateRoute,
+          supportedLocales: const [Locale('ar', ''), Locale('en', '')],
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          locale: state.locale, // 🌍 Set locale from Bloc state
+        );
+      },
+    );
+  }
+}
+/*
+<meta name="monetag" content="7374593d7148f836fb6f268dbfb43439">
+*/

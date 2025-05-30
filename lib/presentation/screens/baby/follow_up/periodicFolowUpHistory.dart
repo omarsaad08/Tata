@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:tata/data/periodicFollowUpServices.dart';
 import 'package:tata/presentation/components/theme.dart';
@@ -28,9 +29,9 @@ class _PeriodicFollowUpHistoryState extends State<PeriodicFollowUpHistory> {
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
                   return InkWell(
-                    onTap: () {
-                      // Navigator.pushNamed(context, "babyPreviousBookingsDetails",
-                      //     arguments: snapshot.data![index]);
+                    onTap: () async {
+                      Navigator.pushNamed(context, "followUpHistoryDetails",
+                          arguments: snapshot.data![index]);
                     },
                     child: Container(
                       margin: EdgeInsets.all(8),

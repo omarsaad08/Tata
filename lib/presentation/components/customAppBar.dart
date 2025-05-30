@@ -5,8 +5,6 @@ import 'package:tata/presentation/components/theme.dart';
 AppBar customAppBar(String title, context, bool showLeading,
     {VoidCallback? onPop}) {
   return AppBar(
-    elevation: 10,
-    backgroundColor: clr(1),
     leading: showLeading
         ? IconButton(
             color: clr(2),

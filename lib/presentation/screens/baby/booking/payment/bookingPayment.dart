@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:tata/data/bookingPaymentServices.dart';
-import 'package:tata/models/payment_method_model.dart';
 import 'package:tata/presentation/components/theme.dart';
 
 class BookingPayment extends StatefulWidget {

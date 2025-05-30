@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:tata/data/auth.dart';
 import 'package:tata/presentation/components/theme.dart';
@@ -12,11 +11,11 @@ class DoctorSettings extends StatefulWidget {
 
 class _DoctorSettingsState extends State<DoctorSettings> {
   List screens = [
-    {
-      "icon": Icon(Icons.language),
-      "name": "تغيير اللغة",
-      "route": "changeLanguage"
-    },
+    // {
+    //   "icon": Icon(Icons.language),
+    //   "name": "تغيير اللغة",
+    //   "route": "changeLanguage"
+    // },
     {"icon": Icon(Icons.logout), "name": "تسجيل الخروج", "route": "logout"}
   ];
   @override
