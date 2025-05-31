@@ -18,9 +18,16 @@ class PeriodicFollowUp extends StatefulWidget {
 
 class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
   String? selectedOption = '3';
-  FollowUp followUp = FollowUp(3);
+  late Future<FollowUp> followUpFuture;
   bool loading = false;
   TextEditingController notesController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    followUpFuture = FollowUp.create(3);
+  }
+
   void _handleCheckboxChange(
       int index, bool? value, List<Map<String, dynamic>> checklistItems) {
     setState(() {
@@ -28,7 +35,7 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
     });
   }
 
-  void clearAllCheckboxes() {
+  void clearAllCheckboxes(FollowUp followUp) {
     setState(() {
       // Reset motor milestones
       for (var item in followUp.motorMilestones) {
@@ -49,10 +56,10 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
     });
   }
 
-  void handleRadioChange(String value) {
+  void handleRadioChange(String value) async {
     setState(() {
       selectedOption = value;
-      followUp.setup(int.parse(value));
+      followUpFuture = FollowUp.create(int.parse(value));
     });
   }
 
@@ -80,247 +87,249 @@ class _PeriodicFollowUpState extends State<PeriodicFollowUp> {
               style: TextStyle(color: clr(0))),
           centerTitle: true,
           backgroundColor: clr(1)),
-      body: Container(
-        padding: EdgeInsets.all(12),
-        child: ListView(
-          children: [
-            Column(
-              children: <Widget>[
-                RadioListTile<String>(
-                  title: Text(context.tr("age-group-3")),
-                  value: '3',
-                  groupValue: selectedOption,
-                  onChanged: (value) {
-                    handleRadioChange(value!);
-                  },
+      body: FutureBuilder<FollowUp>(
+        future: followUpFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          final followUp = snapshot.data!;
+
+          return Container(
+            padding: EdgeInsets.all(12),
+            child: ListView(
+              children: [
+                Column(
+                  children: <Widget>[
+                    RadioListTile<String>(
+                      title: Text(context.tr("age-group-3")),
+                      value: '3',
+                      groupValue: selectedOption,
+                      onChanged: (value) {
+                        handleRadioChange(value!);
+                      },
+                    ),
+                    RadioListTile<String>(
+                      title: Text(context.tr("age-group-6")),
+                      value: '6',
+                      groupValue: selectedOption,
+                      onChanged: (value) {
+                        handleRadioChange(value!);
+                      },
+                    ),
+                    RadioListTile<String>(
+                      title: Text(context.tr("age-group-9")),
+                      value: '9',
+                      groupValue: selectedOption,
+                      onChanged: (value) {
+                        handleRadioChange(value!);
+                      },
+                    ),
+                    RadioListTile<String>(
+                      title: Text(context.tr("age-group-12")),
+                      value: '12',
+                      groupValue: selectedOption,
+                      onChanged: (value) {
+                        handleRadioChange(value!);
+                      },
+                    ),
+                    RadioListTile<String>(
+                      title: Text("من سن 12 الى 18 شهر"),
+                      value: '18',
+                      groupValue: selectedOption,
+                      onChanged: (value) {
+                        handleRadioChange(value!);
+                      },
+                    ),
+                    RadioListTile<String>(
+                      title: Text("من سن 18 الى 24 شهر"),
+                      value: '24',
+                      groupValue: selectedOption,
+                      onChanged: (value) {
+                        handleRadioChange(value!);
+                      },
+                    ),
+                    RadioListTile<String>(
+                      title: Text("من سن سنتين الى 3 سنوات"),
+                      value: '36',
+                      groupValue: selectedOption,
+                      onChanged: (value) {
+                        handleRadioChange(value!);
+                      },
+                    ),
+                    RadioListTile<String>(
+                      title: Text("من سن 3 الى 4 سنوات"),
+                      value: '48',
+                      groupValue: selectedOption,
+                      onChanged: (value) {
+                        handleRadioChange(value!);
+                      },
+                    ),
+                    RadioListTile<String>(
+                      title: Text("من سن 4 الى 5 سنوات"),
+                      value: '60',
+                      groupValue: selectedOption,
+                      onChanged: (value) {
+                        handleRadioChange(value!);
+                      },
+                    ),
+                    RadioListTile<String>(
+                      title: Text("من سن 5 الى 6 سنوات"),
+                      value: '72',
+                      groupValue: selectedOption,
+                      onChanged: (value) {
+                        handleRadioChange(value!);
+                      },
+                    ),
+                  ],
                 ),
-                RadioListTile<String>(
-                  title: Text(context.tr("age-group-6")),
-                  value: '6',
-                  groupValue: selectedOption,
-                  onChanged: (value) {
-                    handleRadioChange(value!);
-                  },
+                SizedBox(height: 8),
+                ExpansionTile(
+                  initiallyExpanded: true,
+                  title: Text(context.tr("motor-milestones")),
+                  leading: Image.asset("assets/motor-milestones.png"),
+                  children: followUp.motorMilestones.map((item) {
+                    int index = followUp.motorMilestones.indexOf(item);
+                    return CheckboxListTile(
+                      title: Text(context.tr(item['label'], fallback: "test")),
+                      value: item['isChecked'],
+                      onChanged: (bool? value) {
+                        _handleCheckboxChange(
+                            index, value, followUp.motorMilestones);
+                      },
+                    );
+                  }).toList(),
                 ),
-                RadioListTile<String>(
-                  title: Text(context.tr("age-group-9")),
-                  value: '9',
-                  groupValue: selectedOption,
-                  onChanged: (value) {
-                    handleRadioChange(value!);
-                  },
+                ExpansionTile(
+                  title: Text("علامات النمو الحسية"),
+                  leading: Image.asset("assets/sensory-milestones.png"),
+                  children: followUp.sensoryMilestones.map((item) {
+                    int index = followUp.sensoryMilestones.indexOf(item);
+                    return CheckboxListTile(
+                      title: Text(item['label']),
+                      value: item['isChecked'],
+                      onChanged: (bool? value) {
+                        _handleCheckboxChange(
+                            index, value, followUp.sensoryMilestones);
+                      },
+                    );
+                  }).toList(),
                 ),
-                RadioListTile<String>(
-                  title: Text(context.tr("age-group-12")),
-                  value: '12',
-                  groupValue: selectedOption,
-                  onChanged: (value) {
-                    handleRadioChange(value!);
-                  },
+                ExpansionTile(
+                  title: Text("علامات نمو التواصل"),
+                  leading: Image.asset("assets/communication-milestones.png"),
+                  children: followUp.communicationMilestones.map((item) {
+                    int index = followUp.communicationMilestones.indexOf(item);
+                    return CheckboxListTile(
+                      title: Text(item['label']),
+                      value: item['isChecked'],
+                      onChanged: (bool? value) {
+                        _handleCheckboxChange(
+                            index, value, followUp.communicationMilestones);
+                      },
+                    );
+                  }).toList(),
                 ),
-                RadioListTile<String>(
-                  title: Text("من سن 12 الى 18 شهر"),
-                  value: '18',
-                  groupValue: selectedOption,
-                  onChanged: (value) {
-                    handleRadioChange(value!);
-                  },
-                ),
-                RadioListTile<String>(
-                  title: Text("من سن 18 الى 24 شهر"),
-                  value: '24',
-                  groupValue: selectedOption,
-                  onChanged: (value) {
-                    handleRadioChange(value!);
-                  },
-                ),
-                RadioListTile<String>(
-                  title: Text("من سن سنتين الى 3 سنوات"),
-                  value: '36',
-                  groupValue: selectedOption,
-                  onChanged: (value) {
-                    handleRadioChange(value!);
-                  },
-                ),
-                RadioListTile<String>(
-                  title: Text("من سن 3 الى 4 سنوات"),
-                  value: '48',
-                  groupValue: selectedOption,
-                  onChanged: (value) {
-                    handleRadioChange(value!);
-                  },
-                ),
-                RadioListTile<String>(
-                  title: Text("من سن 4 الى 5 سنوات"),
-                  value: '60',
-                  groupValue: selectedOption,
-                  onChanged: (value) {
-                    handleRadioChange(value!);
-                  },
-                ),
-                RadioListTile<String>(
-                  title: Text("من سن 5 الى 6 سنوات"),
-                  value: '72',
-                  groupValue: selectedOption,
-                  onChanged: (value) {
-                    handleRadioChange(value!);
-                  },
-                ),
-              ],
-            ),
-            SizedBox(height: 8),
-            ExpansionTile(
-              initiallyExpanded: true,
-              title: Text(context
-                  .tr("motor-milestones")), // Title of the foldable section
-              leading: Image.asset(
-                  "assets/motor-milestones.png"), // Optional leading icon
-              children: followUp.motorMilestones.map((item) {
-                int index = followUp.motorMilestones.indexOf(item);
-                return CheckboxListTile(
-                  title: Text(context.tr(item['label'], fallback: "test")),
-                  value: item['isChecked'],
-                  onChanged: (bool? value) {
-                    _handleCheckboxChange(
-                        index, value, followUp.motorMilestones);
-                  },
-                );
-              }).toList(),
-            ),
-            ExpansionTile(
-              title:
-                  Text("علامات النمو الحسية"), // Title of the foldable section
-              leading: Image.asset(
-                  "assets/sensory-milestones.png"), // Optional leading icon
-              children: followUp.sensoryMilestones.map((item) {
-                int index = followUp.sensoryMilestones.indexOf(item);
-                return CheckboxListTile(
-                  title: Text(item['label']),
-                  value: item['isChecked'],
-                  onChanged: (bool? value) {
-                    _handleCheckboxChange(
-                        index, value, followUp.sensoryMilestones);
-                  },
-                );
-              }).toList(),
-            ),
-            ExpansionTile(
-              title:
-                  Text("علامات نمو التواصل"), // Title of the foldable section
-              leading: Image.asset(
-                  "assets/communication-milestones.png"), // Optional leading icon
-              children: followUp.communicationMilestones.map((item) {
-                int index = followUp.communicationMilestones.indexOf(item);
-                return CheckboxListTile(
-                  title: Text(item['label']),
-                  value: item['isChecked'],
-                  onChanged: (bool? value) {
-                    _handleCheckboxChange(
-                        index, value, followUp.communicationMilestones);
-                  },
-                );
-              }).toList(),
-            ),
-            int.parse(selectedOption!) < 18
-                ? ExpansionTile(
-                    title:
-                        Text("نقاط التغذية"), // Title of the foldable section
-                    leading: Image.asset(
-                        "assets/feeding-milestones.png"), // Optional leading icon
-                    children: followUp.feedingMilestones.map((item) {
-                      int index = followUp.feedingMilestones.indexOf(item);
-                      return CheckboxListTile(
-                        title: Text(item['label']),
-                        value: item['isChecked'],
-                        onChanged: (bool? value) {
-                          _handleCheckboxChange(
-                              index, value, followUp.feedingMilestones);
+                int.parse(selectedOption!) < 18
+                    ? ExpansionTile(
+                        title: Text("نقاط التغذية"),
+                        leading: Image.asset("assets/feeding-milestones.png"),
+                        children: followUp.feedingMilestones.map((item) {
+                          int index = followUp.feedingMilestones.indexOf(item);
+                          return CheckboxListTile(
+                            title: Text(item['label']),
+                            value: item['isChecked'],
+                            onChanged: (bool? value) {
+                              _handleCheckboxChange(
+                                  index, value, followUp.feedingMilestones);
+                            },
+                          );
+                        }).toList(),
+                      )
+                    : SizedBox(),
+                SizedBox(height: 12),
+                mainTextField(notesController, 'ملاحظات', Icon(Icons.notes)),
+                SizedBox(height: 12),
+                mainElevatedButton("العلامات التحذيرية", () {
+                  Navigator.pushNamed(context, 'warningSigns');
+                }, color: clr(2)),
+                mainElevatedButton("تم", () async {
+                  setState(() {
+                    loading = true;
+                  });
+                  try {
+                    followUp.age = int.parse(selectedOption!);
+                    final values = followUp.generateValues();
+                    print('going to get the user from the server');
+                    final data = {
+                      "baby_id":
+                          (await Auth.getCurrentUser(type: 'baby'))!['id'],
+                      "follow_up_date":
+                          DateTime.now().toLocal().toString().split(' ')[0],
+                      "motormilestones": values[0],
+                      "feedingmilestones": values[1],
+                      "communicationmilestones": values[2],
+                      "sensorymilestones": values[3],
+                      "healthy": followUp.healthy,
+                      "notes": notesController.text,
+                    };
+
+                    print('data: $data');
+                    final result =
+                        await PeriodicFollowUpServices.addPeriodicFollowUp(
+                            data);
+                    print('result: $result');
+
+                    final report = followUp.generateReport();
+                    final motorScore = followUp.motorScore;
+                    final sensoryScore = followUp.sensoryScore;
+                    final feedingScore = followUp.feedingScore;
+                    final communicationScore = followUp.communicationScore;
+
+                    clearAllCheckboxes(followUp);
+                    setState(() {
+                      loading = false;
+                    });
+
+                    if (context.mounted) {
+                      Navigator.pushNamed(
+                        context,
+                        "followUpResult",
+                        arguments: {
+                          'healthy': data['healthy'],
+                          'motorScore': motorScore,
+                          'sensoryScore': sensoryScore,
+                          'feedingScore': feedingScore,
+                          'communicationScore': communicationScore,
+                          'reportDetails': report,
                         },
                       );
-                    }).toList(),
-                  )
-                : SizedBox(),
-            SizedBox(
-              height: 12,
+                    }
+                  } catch (e) {
+                    print(e);
+                    setState(() {
+                      loading = false;
+                    });
+                  }
+                }),
+                SizedBox(height: 8),
+                loading
+                    ? Center(
+                        child: SizedBox(
+                            width: 40,
+                            child: CircularProgressIndicator(
+                              color: clr(1),
+                            )))
+                    : Container()
+              ],
             ),
-            mainTextField(notesController, 'ملاحظات', Icon(Icons.notes)),
-            SizedBox(
-              height: 12,
-            ),
-            mainElevatedButton("العلامات التحذيرية", () {
-              Navigator.pushNamed(context, 'warningSigns');
-            }, color: clr(2)),
-            mainElevatedButton("تم", () async {
-              setState(() {
-                loading = true;
-              });
-              try {
-                followUp.age = int.parse(selectedOption!);
-                // send the data to the server to analyze it
-                final values = followUp.generateValues();
-                print('going to get the user from the server');
-                final data = {
-                  "baby_id": (await Auth.getCurrentUser(type: 'baby'))!['id'],
-                  "follow_up_date":
-                      DateTime.now().toLocal().toString().split(' ')[0],
-                  "motormilestones": values[0],
-                  "feedingmilestones": values[1],
-                  "communicationmilestones": values[2],
-                  "sensorymilestones": values[3],
-                  "healthy": followUp.healthy,
-                  "notes": notesController.text,
-                };
-
-                print('data: $data');
-                final result =
-                    await PeriodicFollowUpServices.addPeriodicFollowUp(data);
-                print('result: $result');
-
-                // Generate the report and scores before navigation
-                final report = followUp.generateReport();
-                final motorScore = followUp.motorScore;
-                final sensoryScore = followUp.sensoryScore;
-                final feedingScore = followUp.feedingScore;
-                final communicationScore = followUp.communicationScore;
-
-                // Clear all checkboxes after submission
-                clearAllCheckboxes();
-                setState(() {
-                  loading = false;
-                });
-
-                if (context.mounted) {
-                  Navigator.pushNamed(
-                    context,
-                    "followUpResult",
-                    arguments: {
-                      'healthy': data['healthy'],
-                      'motorScore': motorScore,
-                      'sensoryScore': sensoryScore,
-                      'feedingScore': feedingScore,
-                      'communicationScore': communicationScore,
-                      'reportDetails': report,
-                    },
-                  );
-                }
-              } catch (e) {
-                print(e);
-                setState(() {
-                  loading = false;
-                });
-              }
-            }),
-            SizedBox(height: 8),
-            loading
-                ? Center(
-                    child: SizedBox(
-                        width: 40,
-                        child: CircularProgressIndicator(
-                          color: clr(1),
-                        )))
-                : Container()
-          ],
-        ),
+          );
+        },
       ),
     );
   }

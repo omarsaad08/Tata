@@ -1,91 +1,100 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tata/data/auth.dart';
+import 'package:tata/extensions/translation_extension.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
-import 'package:tata/presentation/screens/auth/privacyPolicyDialog.dart';
 
-import 'package:flutter/services.dart' show rootBundle;
-
-class Signup extends StatefulWidget {
-  const Signup({super.key});
+class SignUp extends StatefulWidget {
+  const SignUp({super.key});
 
   @override
-  State<Signup> createState() => _SignupState();
+  State<SignUp> createState() => _SignUpState();
 }
 
-class _SignupState extends State<Signup> {
-  void _showPrivacyPolicy() async {
-    final markdownText = await rootBundle.loadString('privacy-policy.md');
-
-    showDialog(
-      context: context,
-      builder: (context) => PrivacyPolicyDialog(
-        markdownData: markdownText,
-      ),
-    );
-  }
-
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+class _SignUpState extends State<SignUp> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   bool isPasswordVisible = false;
-  String? errorMessage;
+  bool isConfirmPasswordVisible = false;
   bool loading = false;
+  String? errorMessage;
 
-  Future signUp() async {
-    if (emailController.text != "" || passwordController.text != "") {
-      setState(() {
-        loading = true;
-      });
-      try {
-        final doesUserExist = await Auth.doesUserExist(emailController.text);
-        if (doesUserExist) {
-          final doesDoctorExist =
-              await Auth.doesUserExist(emailController.text, type: "doctor");
-          final doesBabyExist =
-              await Auth.doesUserExist(emailController.text, type: "baby");
-          if (doesDoctorExist || doesBabyExist) {
-            throw Exception("هذا الحساب مسجل بالفعل");
-          } else {
-            final user = await Auth.signIn(
-                emailController.text, passwordController.text);
-            if (user != null) {
-              Navigator.pushReplacementNamed(context, "userSetup");
-              setState(() {
-                loading = false;
-              });
-            } else {
-              setState(() {
-                errorMessage = "هذا الحساب مسجل بالفعل لكن كلمة المرور خطأ";
-                loading = false;
-              });
-            }
+  Future<void> handleAuthResponse(response) async {
+    if (response != null) {
+      final email = response.user?.email;
+      final isVerified = response.user?.emailConfirmedAt != null;
+      if (email != null) {
+        if (isVerified) {
+          if (mounted) {
+            Navigator.pushReplacementNamed(context, "userSetup");
+          }
+        } else {
+          if (mounted) {
+            Navigator.pushReplacementNamed(context, "emailVerification",
+                arguments: {"email": email});
           }
         }
-        final authResponse =
-            await Auth.signUp(emailController.text, passwordController.text);
-        if (authResponse.runtimeType == AuthException) {
-          setState(() {
-            errorMessage = authResponse.toString();
-          });
-        }
-        if (authResponse != null && authResponse.runtimeType != AuthException) {
-          Navigator.pushReplacementNamed(context, "userSetup");
-        } else {
-          throw Exception(authResponse);
-        }
-      } catch (e) {
-        setState(() {
-          loading = false;
-        });
-        print(e.toString());
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("error: $e")));
       }
     } else {
       setState(() {
-        errorMessage = "اكتب الايميل وكلمة المرور";
+        errorMessage = context.tr("auth-failed");
       });
+    }
+  }
+
+  bool validateForm() {
+    if (emailController.text.isEmpty ||
+        passwordController.text.isEmpty ||
+        confirmPasswordController.text.isEmpty) {
+      setState(() {
+        errorMessage = context.tr("please-fill-fields");
+      });
+      return false;
+    }
+
+    if (passwordController.text != confirmPasswordController.text) {
+      setState(() {
+        errorMessage = context.tr("passwords-dont-match");
+      });
+      return false;
+    }
+
+    if (passwordController.text.length < 6) {
+      setState(() {
+        errorMessage = context.tr("password-too-short");
+      });
+      return false;
+    }
+
+    return true;
+  }
+
+  Future<void> signUp() async {
+    if (!validateForm()) return;
+
+    setState(() {
+      loading = true;
+      errorMessage = null;
+    });
+
+    try {
+      final response = await Auth.signUp(
+        emailController.text,
+        passwordController.text,
+      );
+      await handleAuthResponse(response);
+    } catch (e) {
+      setState(() {
+        errorMessage = context.tr("signup-failed");
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          loading = false;
+        });
+      }
     }
   }
 
@@ -93,35 +102,42 @@ class _SignupState extends State<Signup> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 0),
+        padding: const EdgeInsets.symmetric(horizontal: 0),
         child: ListView(
           children: [
             Container(
               width: double.infinity,
-              padding:
-                  EdgeInsets.only(top: 32, bottom: 32, left: 16, right: 16),
+              padding: const EdgeInsets.only(
+                top: 32,
+                bottom: 32,
+                left: 16,
+                right: 16,
+              ),
               decoration: BoxDecoration(
-                  color: clr(1),
-                  borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(25),
-                      bottomRight: Radius.circular(25))),
+                color: clr(1),
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(25),
+                  bottomRight: Radius.circular(25),
+                ),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("إبدأ أول تاتا",
-                      style: TextStyle(color: clr(0), fontSize: 32)),
-                  Text("إنشاء حساب",
-                      style: TextStyle(color: clr(0), fontSize: 20))
+                  Text(
+                    context.tr("signup-title"),
+                    style: TextStyle(color: clr(0), fontSize: 32),
+                  ),
+                  Text(
+                    context.tr("signup"),
+                    style: TextStyle(color: clr(0), fontSize: 20),
+                  ),
                 ],
               ),
             ),
-            SizedBox(
-              height: 32,
-            ),
+            const SizedBox(height: 12),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextField(
                     onChanged: (value) {
@@ -131,7 +147,7 @@ class _SignupState extends State<Signup> {
                     },
                     controller: emailController,
                     decoration: InputDecoration(
-                      labelText: 'البريد الإلكتروني',
+                      labelText: context.tr("email"),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -139,9 +155,7 @@ class _SignupState extends State<Signup> {
                     ),
                     keyboardType: TextInputType.emailAddress,
                   ),
-                  SizedBox(
-                    height: 12,
-                  ),
+                  const SizedBox(height: 12),
                   TextField(
                     onChanged: (value) {
                       setState(() {
@@ -151,7 +165,7 @@ class _SignupState extends State<Signup> {
                     controller: passwordController,
                     obscureText: !isPasswordVisible,
                     decoration: InputDecoration(
-                      labelText: 'كلمة المرور',
+                      labelText: context.tr("password"),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -169,27 +183,59 @@ class _SignupState extends State<Signup> {
                         },
                       ),
                     ),
-                    textDirection: TextDirection.rtl,
                   ),
-                  const SizedBox(height: 8),
-                  errorMessage != null ? Text(errorMessage!) : Container(),
-                  const SizedBox(height: 24),
-                  Text("بتسجيل حسابك فأنت توافق على سياسة الخصوصية الخاصة بنا"),
-                  TextButton(
-                    onPressed: _showPrivacyPolicy,
-                    child: const Text(
-                      'عرض سياسة الخصوصية',
-                      style: TextStyle(
-                        decoration: TextDecoration.underline,
+                  const SizedBox(height: 12),
+                  TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        errorMessage = null;
+                      });
+                    },
+                    controller: confirmPasswordController,
+                    obscureText: !isConfirmPasswordVisible,
+                    decoration: InputDecoration(
+                      labelText: context.tr("confirm-password"),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          isConfirmPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            isConfirmPasswordVisible =
+                                !isConfirmPasswordVisible;
+                          });
+                        },
                       ),
                     ),
                   ),
+                  const SizedBox(height: 24),
+                  if (loading) const CircularProgressIndicator(),
+                  if (errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Text(
+                        errorMessage!,
+                        style: const TextStyle(color: Colors.red),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  const SizedBox(height: 24),
                   Row(
                     children: [
                       Expanded(
                         child: mainElevatedButton(
-                          "إنشاء حساب",
-                          signUp,
+                          context.tr("signup"),
+                          loading
+                              ? null
+                              : () {
+                                  signUp();
+                                },
                         ),
                       ),
                     ],
@@ -199,16 +245,14 @@ class _SignupState extends State<Signup> {
                     onPressed: () {
                       Navigator.popAndPushNamed(context, "login");
                     },
-                    child: const Text(
-                      'عندك حساب؟ سجل الدخول',
-                      style: TextStyle(fontSize: 16),
+                    child: Text(
+                      context.tr("have-account"),
+                      style: const TextStyle(fontSize: 16),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  loading ? CircularProgressIndicator() : Container(),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),

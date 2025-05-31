@@ -4,23 +4,26 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class Auth {
   static final supabase = Supabase.instance.client;
 
-  static Future<Object?> signUp(String email, String password) async {
+  static Future<AuthResponse?> signUp(String email, String password) async {
     try {
-      await supabase.auth.signUp(email: email, password: password);
-      final result = await signIn(email, password);
-      return result;
+      final response = await supabase.auth.signUp(
+        email: email,
+        password: password,
+      );
+      return response;
     } catch (e) {
-      print('error signin up: $e');
-      return e;
+      print('error signing up: $e');
+      return null;
     }
   }
 
   static Future<AuthResponse?> signIn(String email, String password) async {
     try {
-      final user = await Supabase.instance.client.auth
-          .signInWithPassword(email: email, password: password);
-      print("response: $user");
-      return user;
+      final response = await supabase.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+      return response;
     } on AuthException catch (e) {
       print("Authentication Error: ${e.message}");
       return null;
@@ -31,13 +34,19 @@ class Auth {
   }
 
   static Future<void> signOut() async {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      print("Error signing out: $e");
+      throw Exception("Failed to sign out");
+    }
   }
 
   static Future<Map?> getCurrentUser({String type = "user"}) async {
-    final email = getCurrentUserEmail();
-    if (email == null) return null;
     try {
+      final email = getCurrentUserEmail();
+      if (email == null) return null;
+
       if (type == "user") {
         return await supabase
             .from("users")
@@ -54,8 +63,8 @@ class Auth {
       }
     } catch (e) {
       print("error getting user: $e");
+      return null;
     }
-    return null;
   }
 
   static Future<Map?> saveUser(Map data, {String type = "users"}) async {
@@ -63,8 +72,8 @@ class Auth {
       return await supabase.from(type).insert(data).select("*").single();
     } catch (e) {
       print('error saving user: $e');
+      return null;
     }
-    return null;
   }
 
   static String? getCurrentUserEmail() {
@@ -101,5 +110,29 @@ class Auth {
     }
   }
 
-  static Future resetPassword() async {}
+  static Future<bool> resetPassword(String email) async {
+    try {
+      await supabase.auth.resetPasswordForEmail(
+        email,
+        redirectTo: '${Uri.base.origin}/reset-password',
+      );
+      return true;
+    } catch (e) {
+      print('Error resetting password: $e');
+      return false;
+    }
+  }
+
+  static Future<bool> resendVerificationEmail(String email) async {
+    try {
+      await supabase.auth.resend(
+        type: OtpType.signup,
+        email: email,
+      );
+      return true;
+    } catch (e) {
+      print('Error resending verification email: $e');
+      return false;
+    }
+  }
 }

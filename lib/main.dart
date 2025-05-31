@@ -11,6 +11,7 @@ import 'package:tata/presentation/components/theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 late String initialRoute;
+late Map<String, dynamic>? initialRouteArgs;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -23,10 +24,18 @@ void main() async {
   );
   // Determine initial route
   final user = await Auth.getCurrentUser();
-  if (user != null) {
-    initialRoute = '${user['role']}Home';
+  final authUser = Supabase.instance.client.auth.currentUser;
+  if (user != null && authUser != null) {
+    if (authUser.emailConfirmedAt == null) {
+      initialRoute = 'emailVerification';
+      initialRouteArgs = {"email": authUser.email};
+    } else {
+      initialRoute = '${user['role']}Home';
+      initialRouteArgs = null;
+    }
   } else {
     initialRoute = 'login';
+    initialRouteArgs = null;
   }
 
   runApp(MainApp(appRouter: AppRouter()));
@@ -69,7 +78,16 @@ class _AppViewState extends State<AppView> {
             colorScheme: ColorScheme.light(primary: clr(1)),
           ),
           initialRoute: initialRoute,
-          onGenerateRoute: widget.appRouter.generateRoute,
+          onGenerateRoute: (settings) {
+            // If initial route and has args, inject them
+            if (settings.name == initialRoute && initialRouteArgs != null) {
+              return widget.appRouter.generateRoute(RouteSettings(
+                name: initialRoute,
+                arguments: initialRouteArgs,
+              ));
+            }
+            return widget.appRouter.generateRoute(settings);
+          },
           supportedLocales: const [Locale('ar', ''), Locale('en', '')],
           localizationsDelegates: const [
             AppLocalizations.delegate,

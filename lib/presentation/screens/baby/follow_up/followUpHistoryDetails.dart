@@ -1,10 +1,64 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:tata/data/periodicFollowUpServices.dart';
 import 'package:tata/presentation/components/theme.dart';
 
 class FollowUpHistoryDetails extends StatelessWidget {
   final Map followUp;
   const FollowUpHistoryDetails({super.key, required this.followUp});
+
+  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('تأكيد الحذف'),
+          content: const Text('هل أنت متأكد من حذف هذه المتابعة؟'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('إلغاء'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'حذف',
+                style: TextStyle(color: Colors.red),
+              ),
+              onPressed: () async {
+                try {
+                  await PeriodicFollowUpServices.deleteFollowUp(followUp['id']);
+                  if (context.mounted) {
+                    Navigator.of(context).pop(); // Close dialog
+                    Navigator.of(context).pop(
+                        true); // Go back with result true to indicate deletion
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('تم حذف المتابعة بنجاح'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    Navigator.of(context).pop(); // Close dialog
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('حدث خطأ أثناء الحذف: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +73,12 @@ class FollowUpHistoryDetails extends StatelessWidget {
       appBar: AppBar(
         title: const Text('تفاصيل المتابعة'),
         backgroundColor: clr(1),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red),
+            onPressed: () => _showDeleteConfirmationDialog(context),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

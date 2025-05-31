@@ -34,6 +34,7 @@ import 'package:tata/presentation/screens/doctor/notifications.dart';
 import 'package:tata/presentation/screens/doctor/offlineBook.dart';
 import 'package:tata/presentation/screens/auth/forgotPassword.dart';
 import 'package:tata/presentation/screens/doctor/settings/settings.dart';
+import 'package:tata/presentation/screens/auth/emailVerification.dart';
 
 class AppRouter {
   Route? generateRoute(RouteSettings settings) {
@@ -41,7 +42,7 @@ class AppRouter {
       case 'login':
         return MaterialPageRoute(builder: (context) => Login());
       case 'signup':
-        return MaterialPageRoute(builder: (context) => Signup());
+        return MaterialPageRoute(builder: (context) => const SignUp());
       case 'babyHome':
         return MaterialPageRoute(builder: (context) => BabyHome());
       case 'doctorHome':
@@ -154,6 +155,11 @@ class AppRouter {
       case 'forgotPassword':
         return MaterialPageRoute(
           builder: (context) => ForgotPassword(),
+        );
+      case "emailVerification":
+        final args = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+          builder: (context) => EmailVerificationScreen(email: args["email"]),
         );
     }
     return null;

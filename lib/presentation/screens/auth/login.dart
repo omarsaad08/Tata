@@ -18,28 +18,48 @@ class _LoginState extends State<Login> {
   bool loading = false;
   String? errorMessage;
 
-  Future login() async {
-    setState(() {
-      loading = true;
-    });
-    final user =
-        await Auth.signIn(emailController.text, passwordController.text);
-    print("user: $user");
-    if (user != null) {
-      final userType = (await Auth.getCurrentUser())!['role'];
-      print("userType: $userType");
-      if (userType != null) {
-        print("user type: $userType");
-        Navigator.pushReplacementNamed(context, "${userType}Home");
+  Future<void> handleAuthResponse(response) async {
+    if (response != null) {
+      final email = response.user?.email;
+      if (email != null) {
+        final userExists = await Auth.doesUserExist(email);
+        if (userExists) {
+          final userType = (await Auth.getCurrentUser())!['role'];
+          if (mounted && userType != null) {
+            Navigator.pushReplacementNamed(context, "${userType}Home");
+          }
+        } else {
+          if (mounted) {
+            Navigator.pushReplacementNamed(context, "userSetup");
+          }
+        }
       }
-      setState(() {
-        loading = false;
-      });
     } else {
       setState(() {
-        errorMessage = context.tr("email-or-password-wrong");
-        loading = false;
+        errorMessage = context.tr("auth-failed");
       });
+    }
+  }
+
+  Future<void> login() async {
+    setState(() {
+      loading = true;
+      errorMessage = null;
+    });
+    try {
+      final response =
+          await Auth.signIn(emailController.text, passwordController.text);
+      await handleAuthResponse(response);
+    } catch (e) {
+      setState(() {
+        errorMessage = context.tr("email-or-password-wrong");
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          loading = false;
+        });
+      }
     }
   }
 
@@ -47,33 +67,37 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 0),
+        padding: const EdgeInsets.symmetric(horizontal: 0),
         child: ListView(
           children: [
             Container(
               width: double.infinity,
-              padding:
-                  EdgeInsets.only(top: 32, bottom: 32, left: 16, right: 16),
+              padding: const EdgeInsets.only(
+                  top: 32, bottom: 32, left: 16, right: 16),
               decoration: BoxDecoration(
-                  color: clr(1),
-                  borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(25),
-                      bottomRight: Radius.circular(25))),
+                color: clr(1),
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(25),
+                  bottomRight: Radius.circular(25),
+                ),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(context.tr("login-title"),
-                      style: TextStyle(color: clr(0), fontSize: 32)),
-                  Text(context.tr("login"),
-                      style: TextStyle(color: clr(0), fontSize: 20))
+                  Text(
+                    context.tr("login-title"),
+                    style: TextStyle(color: clr(0), fontSize: 32),
+                  ),
+                  Text(
+                    context.tr("login"),
+                    style: TextStyle(color: clr(0), fontSize: 20),
+                  ),
                 ],
               ),
             ),
-            SizedBox(
-              height: 12,
-            ),
+            const SizedBox(height: 12),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Column(
                 children: [
                   TextField(
@@ -92,9 +116,7 @@ class _LoginState extends State<Login> {
                     ),
                     keyboardType: TextInputType.emailAddress,
                   ),
-                  SizedBox(
-                    height: 12,
-                  ),
+                  const SizedBox(height: 12),
                   TextField(
                     onChanged: (value) {
                       setState(() {
@@ -124,44 +146,57 @@ class _LoginState extends State<Login> {
                     ),
                     textDirection: TextDirection.rtl,
                   ),
-
                   const SizedBox(height: 4),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       TextButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, 'forgotPassword');
-                          },
-                          child: Text(context.tr("forget password"))),
+                        onPressed: () {
+                          Navigator.pushNamed(context, 'forgotPassword');
+                        },
+                        child: Text(context.tr("forget password")),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  loading ? CircularProgressIndicator() : Container(),
-                  errorMessage != null ? Text(errorMessage!) : Container(),
+                  if (loading) const CircularProgressIndicator(),
+                  if (errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Text(
+                        errorMessage!,
+                        style: const TextStyle(color: Colors.red),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                   const SizedBox(height: 24),
                   Row(
                     children: [
                       Expanded(
-                        child: mainElevatedButton(context.tr("login"), login),
+                        child: mainElevatedButton(
+                          context.tr("login"),
+                          loading
+                              ? null
+                              : () {
+                                  login();
+                                },
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
-
-                  // Sign-up Text
                   TextButton(
                     onPressed: () {
                       Navigator.popAndPushNamed(context, "signup");
                     },
                     child: Text(
                       context.tr("don't have an account"),
-                      style: TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                     ),
                   ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),

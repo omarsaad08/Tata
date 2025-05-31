@@ -2,7 +2,6 @@
     "title": "تاتا",
     "home": "الرئيسية",
     "profile": "الحساب",
-
     "login-title": "إبدأ أول تاتا!",
     "login": "تسجيل الدخول",
     "signup": "إنشاء حساب",
@@ -10,7 +9,6 @@
     "password": "كلمة المرور",
     "forget password": "نسيت كلمة المرور؟",
     "don't have an account": "معندكش حساب؟ إنشاء حساب جديد",
-
     "child-name": "اسم الطفل",
     "doctor-name": "اسم الدكتور",
     "age-range": "الفئة العمرية",
@@ -32,7 +30,6 @@
     "start-first-followup": "ابدأي اول متابعة دورية لمعرفة نمو طفلك!",
     "have-account": "عندك حساب؟ سجل دخولك",
     "no-image-selected": "لم يتم اختيار صورة",
-    
     "done": "تم",
     "time-settings": "إعدادات المواعيد",
     "choose-available-days": "اختر الأيام المتاحة",
@@ -67,17 +64,25 @@
     "feeding-milestones": "نقاط التغذية",
     "notes": "ملاحظات",
     "warning-signs": "العلامات التحذيرية",
-
     "motorMilestones_1_3": "القدرة على الرضاعة الطبيعية",
-    "motorMilestones_2_3":"القدرة على وضع اليدين في الفم",
+    "motorMilestones_2_3": "القدرة على وضع اليدين في الفم",
     "motorMilestones_3_3": "القدرة على فتح وإغلاق قبضات ايده",
     "motorMilestones_4_3": "تحريك الذراعين والساقين عند الشعور بالحماس",
     "motorMilestones_5_3": "رفع الرأس عند الاستلقاء على البطن",
     "motorMilestones_6_3": "الدفع بالذراعين عند الاستلقاء على البطن",
     "sensoryMilestones_1_3": "القدرة على الهدوء مع الهز واللمس والأصوات الهادئة",
     "sensoryMilestones_2_3": "الاستمتاع بحركات متنوعة",
-    "sensoryMilestones_3_3":"محاولة الوصول إلى لعبة عند الاستلقاء على الظهر",
+    "sensoryMilestones_3_3": "محاولة الوصول إلى لعبة عند الاستلقاء على الظهر",
     "sensoryMilestones_4_3": "إبقاء الرأس مركزًا لمشاهدة الوجوه أو الألعاب عند الاستلقاء على الظهر",
     "sensoryMilestones_5_3": "متابعة لعبة متحركة من جانب إلى جانب عند الاستلقاء على الظهر",
-    "communicationMilestones_1_3": "إصدار أصوات ابتسامة"
+    "communicationMilestones_1_3": "إصدار أصوات ابتسامة",
+    "sign-in-with-google": "تسجيل الدخول باستخدام جوجل",
+    "google-sign-in-failed": "فشل تسجيل الدخول باستخدام جوجل",
+    "signup-title": "إبدأ أول تاتا!",
+    "confirm-password": "تأكيد كلمة المرور",
+    "passwords-dont-match": "كلمات المرور غير متطابقة",
+    "password-too-short": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+    "signup-failed": "فشل إنشاء الحساب",
+    "auth-failed": "فشل تسجيل الدخول",
+    "sign-up-with-google": "إنشاء حساب باستخدام جوجل"
 }

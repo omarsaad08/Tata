@@ -26,4 +26,12 @@ class PeriodicFollowUpServices {
     }
     return null;
   }
+
+  static Future<void> deleteFollowUp(int followUpId) async {
+    try {
+      await supabase.from("follow_up").delete().eq("id", followUpId);
+    } catch (e) {
+      throw Exception("error deleting follow up: $e");
+    }
+  }
 }
