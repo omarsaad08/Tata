@@ -3,6 +3,8 @@ import 'package:tata/data/auth.dart';
 import 'package:tata/extensions/translation_extension.dart';
 import 'package:tata/presentation/components/mainElevatedButton.dart';
 import 'package:tata/presentation/components/theme.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'privacyPolicyDialog.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -241,6 +243,35 @@ class _SignUpState extends State<SignUp> {
                     ],
                   ),
                   const SizedBox(height: 16),
+                  // Privacy Policy message and button
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            context.tr("by-signing-up-you-agree"),
+                            style: const TextStyle(fontSize: 14),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            final markdown = await rootBundle
+                                .loadString('assets/privacy-policy.md');
+                            if (!mounted) return;
+                            showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  PrivacyPolicyDialog(markdownData: markdown),
+                            );
+                          },
+                          child: Text(context.tr("privacy-policy")),
+                        ),
+                      ],
+                    ),
+                  ),
                   TextButton(
                     onPressed: () {
                       Navigator.popAndPushNamed(context, "login");
